@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>Hexo</title>
+      <link href="2021/01/11/Hexo/"/>
+      <url>2021/01/11/Hexo/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Hexo-Quick-Start"><a href="#Hexo-Quick-Start" class="headerlink" title="Hexo Quick Start"></a>Hexo Quick Start</h1><h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><ul><li><a href="http://nodejs.org/">Node.js</a></li><li><a href="http://git-scm.com/">Git</a></li><li>Create Github repository [username.github.io]</li></ul><h3 id="1-Install-Hexo"><a href="#1-Install-Hexo" class="headerlink" title="1.Install Hexo"></a>1.Install Hexo</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g hexo-cli</span><br></pre></td></tr></table></figure><h3 id="2-initialize"><a href="#2-initialize" class="headerlink" title="2.initialize"></a>2.initialize</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init &lt;folder&gt;</span><br><span class="line">$ cd &lt;folder&gt;</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure><h3 id="3-configuration-config-yml-file"><a href="#3-configuration-config-yml-file" class="headerlink" title="3.configuration _config.yml file"></a>3.configuration _config.yml file</h3><p>more info: <a href="https://hexo.io/docs/configuration">Configuration</a></p><h3 id="4-Create-a-new-post"><a href="#4-Create-a-new-post" class="headerlink" title="4.Create a new post"></a>4.Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="5-Run-server"><a href="#5-Run-server" class="headerlink" title="5.Run server"></a>5.Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><ul><li>connect localhost:4000</li></ul><h3 id="6-Generate-static-files-And-Deploy-to-remote-Repository"><a href="#6-Generate-static-files-And-Deploy-to-remote-Repository" class="headerlink" title="6.Generate static files And Deploy to remote Repository"></a>6.Generate static files And Deploy to remote Repository</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><h3 id="Issue"><a href="#Issue" class="headerlink" title="Issue"></a>Issue</h3><p>if ERROR Deployer not found: git</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure><p>_config.yml plugins add</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plugins:</span><br><span class="line">- hexo-deployer-git</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> Quick Start </tag>
+            
+            <tag> Hexo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
