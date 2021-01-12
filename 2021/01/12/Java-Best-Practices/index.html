@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang=ko>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Programing Principles KISS - “Keep It Simple, Stupid”  DRY - “Don’t Repeat Yourself” YAGNI - “You Ain’t Gonna Need It” - 필요할 때에 구현해라 Avoid premature optimization - 최적화는 뒤로 미뤄라 Single responsibility Co">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java Best Practices">
+<meta property="og:url" content="https://timpac31.github.io/2021/01/12/Java-Best-Practices/index.html">
+<meta property="og:site_name" content="Timpac&#39;s Blog">
+<meta property="og:description" content="Programing Principles KISS - “Keep It Simple, Stupid”  DRY - “Don’t Repeat Yourself” YAGNI - “You Ain’t Gonna Need It” - 필요할 때에 구현해라 Avoid premature optimization - 최적화는 뒤로 미뤄라 Single responsibility Co">
+<meta property="og:locale" content="ko_KR">
+<meta property="article:published_time" content="2021-01-12T11:44:57.000Z">
+<meta property="article:modified_time" content="2021-01-12T14:12:27.325Z">
+<meta property="article:author" content="Jo Yeoung Duk">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="Practice">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Java Best Practices</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2021/01/11/Hexo/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/01/12/Java-Best-Practices/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&text=Java Best Practices"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&is_video=false&description=Java Best Practices"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java Best Practices&body=Check out this article: https://timpac31.github.io/2021/01/12/Java-Best-Practices/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&name=Java Best Practices&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Programing-Principles"><span class="toc-number">1.</span> <span class="toc-text">Programing Principles</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Packages"><span class="toc-number">2.</span> <span class="toc-text">Packages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classes"><span class="toc-number">3.</span> <span class="toc-text">Classes</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#static"><span class="toc-number">3.1.</span> <span class="toc-text">static</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#inheritance"><span class="toc-number">3.2.</span> <span class="toc-text">inheritance</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Interfaces"><span class="toc-number">3.3.</span> <span class="toc-text">Interfaces</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Generics"><span class="toc-number">4.</span> <span class="toc-text">Generics</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exceptions"><span class="toc-number">5.</span> <span class="toc-text">Exceptions</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Java Best Practices
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Timpac's Blog</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2021-01-12T11:44:57.000Z" itemprop="datePublished">2021-01-12</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/JAVA/" rel="tag">JAVA</a>, <a class="tag-link-link" href="/tags/Practice/" rel="tag">Practice</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Programing-Principles"><a href="#Programing-Principles" class="headerlink" title="Programing Principles"></a>Programing Principles</h2><ul>
+<li>KISS - “Keep It Simple, Stupid” </li>
+<li>DRY - “Don’t Repeat Yourself”</li>
+<li>YAGNI - “You Ain’t Gonna Need It” - 필요할 때에 구현해라</li>
+<li>Avoid premature optimization - 최적화는 뒤로 미뤄라</li>
+<li>Single responsibility</li>
+<li>Composition over Inheritance - 상속보다는 구성</li>
+<li>Fail fast, fail hard</li>
+</ul>
+<h2 id="Packages"><a href="#Packages" class="headerlink" title="Packages"></a>Packages</h2><ol>
+<li>technical layers package<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/project</span><br><span class="line">    ├─ controller</span><br><span class="line">    │     ├─ BoardController</span><br><span class="line">    │     ├─ UserController</span><br><span class="line">    │     ├─ ...</span><br><span class="line">    ├─ dao</span><br><span class="line">    │     ├─ BoardDao</span><br><span class="line">    │     ├─ UserDao</span><br><span class="line">    │     ├─ ...</span><br><span class="line">    ├─ service</span><br><span class="line">    │     ├─ BoardService</span><br><span class="line">    │     ├─ UserService</span><br><span class="line">    │     ├─ ...</span><br></pre></td></tr></table></figure></li>
+<li>domain concern package<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/project</span><br><span class="line">    ├─ User</span><br><span class="line">    │     ├─ UserController</span><br><span class="line">    │     ├─ UserService</span><br><span class="line">    │     ├─ UserDao</span><br><span class="line">    ├─ Board</span><br><span class="line">    │     ├─ BoardController</span><br><span class="line">    │     ├─ BoardService</span><br><span class="line">    │     ├─ BoardDao      </span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>개인적으로 기술적 레이어 보단 도메인 개념을 선호함<br></p>
+</blockquote>
+</li>
+</ol>
+<h2 id="Classes"><a href="#Classes" class="headerlink" title="Classes"></a>Classes</h2><h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><ul>
+<li>static 클래스의 인스턴스화를 막아라 -&gt; private constructor</li>
+<li>should be stateless, immutable, not allow subclassing, and thread-safe</li>
+</ul>
+<h3 id="inheritance"><a href="#inheritance" class="headerlink" title="inheritance"></a>inheritance</h3><ul>
+<li><p>상속보다는 구성을 사용하라</p>
+<blockquote>
+<p>effective java의 유명한 hashset.add() 예제가 있음 ㅎㅎ<br><br>상속은 a is b 일때 타입을 강제할 때만 사용하자<br></p>
+</blockquote>
+</li>
+<li><p>Do not expose protected field</p>
+</li>
+<li><p>class 변수에 final를 사용할 수 있다면 하는게 좋다</p>
+</li>
+<li><p>상속할 필요가 없는 class는 final class로 만들어라. 메서드도 마찬가지</p>
+</li>
+<li><p>빈 기본 생성자는 만들지마라 (자바가 알아서 만들어 줌)</p>
+</li>
+</ul>
+<h3 id="Interfaces"><a href="#Interfaces" class="headerlink" title="Interfaces"></a>Interfaces</h3><ul>
+<li>Do not use the constant interface pattern<blockquote>
+<p>static class를 사용하자</p>
+</blockquote>
+</li>
+<li>Avoid Interface overuse<blockquote>
+<p>확장 가능성이 없는데 interface 만들고, abstract class 만들고 구현체 만드는 것은 오버 엔지니어링</p>
+</blockquote>
+</li>
+<li>interface는 최대한 작게 유지. client는 사용법만 알면됨</li>
+</ul>
+<h2 id="Generics"><a href="#Generics" class="headerlink" title="Generics"></a>Generics</h2><ul>
+<li>가능하면 base class 나 interface 대신에 type inference를 리턴하라<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T extends MyObject&gt; <span class="function">T <span class="title">getObject</span><span class="params">(<span class="keyword">int</span> type)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (T) factory.create(type);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MySpecialObject</span> <span class="keyword">extends</span> <span class="title">MyObject</span>&lt;<span class="title">SpecialType</span>&gt; </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">MySpecialObject</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="keyword">super</span>(Collections.emptyList());   <span class="comment">// This is ugly, as we loose type</span></span><br><span class="line">     <span class="keyword">super</span>(Collections.EMPTY_LIST();    <span class="comment">// This is just dumb</span></span><br><span class="line">     <span class="comment">// But this is beauty</span></span><br><span class="line">     <span class="keyword">super</span>(<span class="keyword">new</span> ArrayList&lt;SpecialType&gt;());    </span><br><span class="line">     <span class="keyword">super</span>(Collections.&lt;SpecialType&gt;emptyList());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>PECS 공식 : Producer-extends, Consumer-super</li>
+</ul>
+<h2 id="Exceptions"><a href="#Exceptions" class="headerlink" title="Exceptions"></a>Exceptions</h2><ul>
+<li>복구 가능한 예외는 checked Exception을 사용</li>
+</ul>
+<ol>
+<li>BAD<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Integer value = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;<span class="keyword">catch</span>(NumberFormatException e) &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(value == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">//handle bad string</span></span><br><span class="line">&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//business logic</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>GOOD<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( (str != <span class="keyword">null</span>) &amp;&amp; str.matches(<span class="string">&quot;-?\\d++&quot;</span>) ) &#123;</span><br><span class="line">    Integer value = Integer.valueOf(str);</span><br><span class="line">    <span class="comment">//business logic</span></span><br><span class="line">&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//handle bad string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>예외처리는 도메인 레벨에서 하자</li>
+</ul>
+<ol>
+<li>BAD<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">getUser</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          ps = conn.prepareStatement(<span class="string">&quot;SELECT * from users&quot;</span>);</span><br><span class="line">          rs = ps.executeQuery();</span><br><span class="line">          <span class="comment">//... return result</span></span><br><span class="line">        &#125;<span class="keyword">catch</span>&#123;</span><br><span class="line">          log.error(<span class="string">&quot;exception~&quot;</span>);</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">//close resource</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>GOOD<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">getUser</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          ps = conn.prepareStatement(<span class="string">&quot;SELECT * from users&quot;</span>);</span><br><span class="line">          rs = ps.executeQuery();</span><br><span class="line">          <span class="comment">//... return result</span></span><br><span class="line">        &#125;<span class="keyword">catch</span>&#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> DataBaseLevelExcpetion(e);</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">//close resource</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>로깅은 에러발생 시점이 아니라 예외 핸들링 시점에 해야한다</li>
+<li>Use Standard Exception</li>
+<li>에러 코드 리턴보다 Exception을 사용해라</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Programing-Principles"><span class="toc-number">1.</span> <span class="toc-text">Programing Principles</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Packages"><span class="toc-number">2.</span> <span class="toc-text">Packages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Classes"><span class="toc-number">3.</span> <span class="toc-text">Classes</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#static"><span class="toc-number">3.1.</span> <span class="toc-text">static</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#inheritance"><span class="toc-number">3.2.</span> <span class="toc-text">inheritance</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Interfaces"><span class="toc-number">3.3.</span> <span class="toc-text">Interfaces</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Generics"><span class="toc-number">4.</span> <span class="toc-text">Generics</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exceptions"><span class="toc-number">5.</span> <span class="toc-text">Exceptions</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/01/12/Java-Best-Practices/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&text=Java Best Practices"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&is_video=false&description=Java Best Practices"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java Best Practices&body=Check out this article: https://timpac31.github.io/2021/01/12/Java-Best-Practices/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&title=Java Best Practices"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/01/12/Java-Best-Practices/&name=Java Best Practices&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Jo Yeoung Duk
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+
+
+
