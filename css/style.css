@@ -1073,6 +1073,13 @@ article .content video {
   height: auto;
   margin: auto;
 }
+article .content img {
+  display: block;
+}
+article .content img + em {
+  display: block;
+  text-align: center;
+}
 article .content .video-container {
   position: relative;
   padding-top: 56.25%;
@@ -1091,11 +1098,10 @@ article .content .video-container embed {
 }
 article .content blockquote {
   background: inherit;
-  color: #2296cc;
-  font-style: italic;
+  color: #0b82b9;
   border-left: 3px solid #2bbc8a;
   margin: 1rem 10px;
-  padding: 0.5em 10px;
+  padding: 0.3em 10px;
   quotes: "\201C" "\201D" "\2018" "\2019";
 }
 article .content blockquote p {
