@@ -412,8 +412,9 @@
   font-weight: bold;
 }
 .content table {
-  width: 100%;
+/*width: 100%*/
   font-size: 12px;
+  border: 2px solid #deaae1;
   border-collapse: collapse;
   text-align: left;
 }
