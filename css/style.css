@@ -1422,6 +1422,7 @@ pre code {
 }
 .highlight table {
   width: auto;
+  border: none;
 }
 .highlight td.gutter {
   text-align: right;
