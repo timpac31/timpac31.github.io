@@ -413,13 +413,13 @@
 }
 .content table {
 /*width: 100%*/
-  font-size: 12px;
+  font-size: 14px;
   border: 2px solid #deaae1;
   border-collapse: collapse;
   text-align: left;
 }
 .content th {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: bold;
   color: #383838;
   border-bottom: 1px dashed #ccc;
@@ -443,7 +443,7 @@ html {
 body {
   color: #383838;
   background-color: #fff;
-  font-size: 14px;
+  font-size: 16px;
   font-family: "Menlo", "Meslo LG", monospace;
   font-weight: 400;
   line-height: 1.725;
@@ -1099,7 +1099,7 @@ article .content .video-container embed {
 }
 article .content blockquote {
   background: inherit;
-  color: #0b82b9;
+  color: #1e6316;
   border-left: 3px solid #2bbc8a;
   margin: 1rem 10px;
   padding: 0.3em 10px;

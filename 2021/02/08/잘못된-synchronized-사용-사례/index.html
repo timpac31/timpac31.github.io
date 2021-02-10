@@ -6,22 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="SCENARIO하루에 10명만 받아야하는 신청프로그램 개발건이 들어왔다.초보 개발자 김삽질씨는 나름 열심히 고민해서 프로그래밍했다“신청자가 10명이 넘으면 안되니까 신청자가 몇명인지 조회하고 10명 이하면 신청이 안되게 해야겠다~” 1234567891011121314public class ApplicantManager &amp;#123;    private st">
+    <meta name="description" content="SCENARIO하루에 10명만 받아야하는 신청프로그램 개발건이 들어왔다.초보 개발자 김삽질씨는 나름 열심히 고민해서 프로그래밍했다“신청자가 10명이 넘으면 안되니까 신청자가 몇명인지 조회하고 10명 이상이면 신청이 안되게 해야겠다~” 1234567891011121314public class ApplicantManager &amp;#123;    private s">
 <meta property="og:type" content="article">
 <meta property="og:title" content="잘못된 synchronized 사용 사례">
 <meta property="og:url" content="https://timpac31.github.io/2021/02/08/%EC%9E%98%EB%AA%BB%EB%90%9C-synchronized-%EC%82%AC%EC%9A%A9-%EC%82%AC%EB%A1%80/index.html">
 <meta property="og:site_name" content="Timpac&#39;s Blog">
-<meta property="og:description" content="SCENARIO하루에 10명만 받아야하는 신청프로그램 개발건이 들어왔다.초보 개발자 김삽질씨는 나름 열심히 고민해서 프로그래밍했다“신청자가 10명이 넘으면 안되니까 신청자가 몇명인지 조회하고 10명 이하면 신청이 안되게 해야겠다~” 1234567891011121314public class ApplicantManager &amp;#123;    private st">
+<meta property="og:description" content="SCENARIO하루에 10명만 받아야하는 신청프로그램 개발건이 들어왔다.초보 개발자 김삽질씨는 나름 열심히 고민해서 프로그래밍했다“신청자가 10명이 넘으면 안되니까 신청자가 몇명인지 조회하고 10명 이상이면 신청이 안되게 해야겠다~” 1234567891011121314public class ApplicantManager &amp;#123;    private s">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:image" content="https://timpac31.github.io/images/refer/synchronize.jpg">
 <meta property="og:image" content="https://timpac31.github.io/images/fail.jpg">
 <meta property="og:image" content="https://timpac31.github.io/images/run.jpg">
 <meta property="article:published_time" content="2021-02-08T13:54:04.000Z">
-<meta property="article:modified_time" content="2021-02-08T14:15:13.392Z">
+<meta property="article:modified_time" content="2021-02-10T12:44:28.412Z">
 <meta property="article:author" content="Jo Yeoung Duk">
 <meta property="article:tag" content="JAVA">
-<meta property="article:tag" content="Practice">
 <meta property="article:tag" content="Parallel Programming">
+<meta property="article:tag" content="Practice">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://timpac31.github.io/images/refer/synchronize.jpg">
     
@@ -145,7 +145,7 @@
 
   <div class="content" itemprop="articleBody">
     <p><img src="/images/refer/synchronize.jpg" alt="synchronize"></p>
-<h2 id="SCENARIO"><a href="#SCENARIO" class="headerlink" title="SCENARIO"></a>SCENARIO</h2><p>하루에 10명만 받아야하는 신청프로그램 개발건이 들어왔다.<br>초보 개발자 김삽질씨는 나름 열심히 고민해서 프로그래밍했다<br>“신청자가 10명이 넘으면 안되니까 신청자가 몇명인지 조회하고 10명 이하면 신청이 안되게 해야겠다~”</p>
+<h2 id="SCENARIO"><a href="#SCENARIO" class="headerlink" title="SCENARIO"></a>SCENARIO</h2><p>하루에 10명만 받아야하는 신청프로그램 개발건이 들어왔다.<br>초보 개발자 김삽질씨는 나름 열심히 고민해서 프로그래밍했다<br>“신청자가 10명이 넘으면 안되니까 신청자가 몇명인지 조회하고 10명 이상이면 신청이 안되게 해야겠다~”</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicantManager</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;Integer&gt; applicantList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> APPLICANT_LIMIT = <span class="number">10</span>;</span><br><span class="line">	</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">applicate</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(applicantList.size() &lt; APPLICANT_LIMIT) &#123;</span><br><span class="line">            applicantList.add(id);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Integer&gt; <span class="title">getApplicantList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> applicantList;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>개발이 끝나고 신청 당일날 고객한테 전화가 왔다.</p>
 <p>“총 신청자가 12명인대요?”</p>
@@ -263,6 +263,12 @@
   </div>
 </article>
 
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
 
 
     </div>
@@ -363,5 +369,18 @@
 
 
 
+
+    <!-- Disqus Comments -->
+    <script type="text/javascript">
+        var disqus_shortname = 'timpac';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
 
 
