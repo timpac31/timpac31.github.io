@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang=ko>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="개요얼마전 유지보수 하는 곳의 권한 체크하는 부분의 소스를 보다가 신기한(?) 코드를 발견했다. 12345String author &#x3D; (String)session.getAttribute(&quot;author&quot;);if(author &#x3D;&#x3D; &quot;admin&quot;) &amp;#123;    &#x2F;&#x2F;관리자    ...&amp;#125;  오잉? 세션으로 권한 체크">
+<meta property="og:type" content="article">
+<meta property="og:title" content="세션 클러스터링(Session Clustering)과 JVM Memory">
+<meta property="og:url" content="https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/index.html">
+<meta property="og:site_name" content="Timpac&#39;s Blog">
+<meta property="og:description" content="개요얼마전 유지보수 하는 곳의 권한 체크하는 부분의 소스를 보다가 신기한(?) 코드를 발견했다. 12345String author &#x3D; (String)session.getAttribute(&quot;author&quot;);if(author &#x3D;&#x3D; &quot;admin&quot;) &amp;#123;    &#x2F;&#x2F;관리자    ...&amp;#125;  오잉? 세션으로 권한 체크">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:image" content="https://timpac31.github.io/images/frog-question.jpg">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/session/session-routing-first.png">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/session/session-routing-second.png">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/session/session_server.png">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/session/session-capture.png">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/session/constant-pool-complie.png">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/session/jvm-constantpool.png">
+<meta property="article:published_time" content="2021-04-02T02:47:54.000Z">
+<meta property="article:modified_time" content="2021-04-02T11:04:04.046Z">
+<meta property="article:author" content="Jo Yeoung Duk">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="Session">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://timpac31.github.io/images/frog-question.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>세션 클러스터링(Session Clustering)과 JVM Memory</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2021/03/10/Cookie-SameSite%EC%99%80-Session-%EB%81%8A%EA%B9%80-%EB%AC%B8%EC%A0%9C/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&text=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&is_video=false&description=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=세션 클러스터링(Session Clustering)과 JVM Memory&body=Check out this article: https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&name=세션 클러스터링(Session Clustering)과 JVM Memory&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"></span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%EA%B0%9C%EC%9A%94"><span class="toc-number">1.1.</span> <span class="toc-text">개요</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EC%9D%98%EB%AC%B8%EC%A0%90"><span class="toc-number">1.2.</span> <span class="toc-text">의문점</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EC%84%B8%EC%85%98-%ED%8A%B8%EB%9E%98%ED%82%B9-Session-Tracking-%EB%8F%99%EC%9E%91%EB%B0%A9%EC%8B%9D"><span class="toc-number">1.3.</span> <span class="toc-text">세션 트래킹(Session Tracking) 동작방식</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session-Routing-Test"><span class="toc-number">1.4.</span> <span class="toc-text">Session Routing Test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HttpSession%EA%B3%BC-JVM-Constant-Pool"><span class="toc-number">1.5.</span> <span class="toc-text">HttpSession과 JVM Constant Pool</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        세션 클러스터링(Session Clustering)과 JVM Memory
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Timpac's Blog</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2021-04-02T02:47:54.000Z" itemprop="datePublished">2021-04-02</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/JAVA/" rel="tag">JAVA</a>, <a class="tag-link-link" href="/tags/Session/" rel="tag">Session</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h1 id=""><a href="#" class="headerlink" title=""></a></h1><h2 id="개요"><a href="#개요" class="headerlink" title="개요"></a>개요</h2><p>얼마전 유지보수 하는 곳의 권한 체크하는 부분의 소스를 보다가 신기한(?) 코드를 발견했다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String author = (String)session.getAttribute(<span class="string">&quot;author&quot;</span>);</span><br><span class="line"><span class="keyword">if</span>(author == <span class="string">&quot;admin&quot;</span>) &#123;</span><br><span class="line">    <span class="comment">//관리자</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>오잉? 세션으로 권한 체크를 하는데 String 비교에 indentity(==) 연산을 사용하고 있다.</p>
+</blockquote>
+<p>내가 이상하게 생각한 이유는 해당 시스템의 환경때문이다.<br>java servlet engine이 분산 클러스터로 구성되어서 각각의 container는 독립된 JVM을 가지고 있었기 때문이다.<br>그런데 또 기능은 잘 동작된다. ㅎㅎ<br>만약 두개의 웹엔진 A,B가 있다고 했을 때 처음 요청은 A로 다음 요청은 B로 보낸다면 session.getAttribute(“author”)로 session을 가져올 때마다 각각의 다른 JVM 메모리에서 가져올텐데 어떻게 독립된 JVM에서 같은 레퍼런스를 참조할 수 있는걸까??</p>
+<p><img src="/images/frog-question.jpg" alt="question"><em>뭐지..?</em></p>
+<h2 id="의문점"><a href="#의문점" class="headerlink" title="의문점"></a>의문점</h2><ol>
+<li>2개의 웹 엔진 A, B가 있을 때 독립된 세션 메모리를 어떻게 같이 공유할 수 있는가?</li>
+<li>같은 세션 메모리를 참조한다고 했을 때 String indentity 연산은 왜 잘 작동하는가?</li>
+</ol>
+<p>먼저 의문점 1번을 해결하기 위해서 해당 서버인 JEUS의 session tracking 방식에 대해 알아보았다.</p>
+<h2 id="세션-트래킹-Session-Tracking-동작방식"><a href="#세션-트래킹-Session-Tracking-동작방식" class="headerlink" title="세션 트래킹(Session Tracking) 동작방식"></a>세션 트래킹(Session Tracking) 동작방식</h2><p>세션 트래킹(Session Tracking) 동작방식에는 세션라우팅, 세션서버, 혼합방식이 있다.</p>
+<ol>
+<li>세션 라우팅(Session Routing)<br>세션라우팅은 해당 세션에 자신이 생성 또는 저장된 엔진의 ID를 부여한다.<br>다음 요청이 올 때 쿠키에 해당 엔진의 아이디가 포함되어 있어서 항상 같은 엔진으로 요청을 보내게 된다.</li>
+</ol>
+<p><img src="/images/refer/session/session-routing-first.png" alt="세션라우팅"><em>첫번째 요청</em></p>
+<p><img src="/images/refer/session/session-routing-second.png" alt="세션라우팅"><em>두번째 요청</em></p>
+<p>첫번째 요청을했을 때 세션오브젝트와 쿠키에 엔진 이름을 붙여서 넣는다.<br>두번째 요청을했을 때 세션쿠키의 이름에 따라 해당 엔진으로 요청을 보낸다.</p>
+<ol start="2">
+<li>세선 서버(Session Server)<br><img src="/images/refer/session/session_server.png" alt="세션서버"><em>출처:<a target="_blank" rel="noopener" href="https://technet.tmaxsoft.com/">https://technet.tmaxsoft.com</a></em></li>
+</ol>
+<p>궁금증이 해결되었다. 세션라우팅방식으로 되어있어서 세션쿠키 아이디에 엔진 이름을 담아서 하나의 세션스코프 동안에는 항상 세션이 생성된 엔진으로만 요청이 가게된다. </p>
+<h2 id="Session-Routing-Test"><a href="#Session-Routing-Test" class="headerlink" title="Session Routing Test"></a>Session Routing Test</h2><p>정말 그런지 테스트를 해봤다. 먼저 세션을 확인 할수 있는 jsp페이지를 만든다</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;%</span><br><span class="line">    HttpSession sess = request.getSession();</span><br><span class="line">    <span class="keyword">if</span>(request.getParameter(<span class="string">&quot;key&quot;</span>) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        sess.setAttribute(request.getParameter(<span class="string">&quot;key&quot;</span>),request.getParameter(<span class="string">&quot;val&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">boolean</span> isNew = session.isNew();</span><br><span class="line">    String sessionId = session.getId();</span><br><span class="line">    <span class="keyword">long</span> creationTime = session.getCreationTime();</span><br><span class="line">    <span class="keyword">long</span> lastAccessedTime = session.getLastAccessedTime();</span><br><span class="line">    <span class="keyword">int</span> maxInactiveInterval = session.getMaxInactiveInterval();</span><br><span class="line">%&gt;</span><br><span class="line">&lt;table border=<span class="number">1</span>&gt;</span><br><span class="line">    &lt;tr bgcolor=&quot;gray&quot;&gt;&lt;td colspan=2 align=&quot;center&quot;&gt;&lt;b&gt;Session Info&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;</span><br><span class="line">    &lt;tr&gt;</span><br><span class="line">        &lt;td width=&quot;25%&quot;&gt;Session ID&lt;/td&gt;&lt;td width=&quot;75%&quot;&gt;&lt;%=sessionId%&gt;&lt;/td&gt;</span><br><span class="line">    &lt;/tr&gt;</span><br><span class="line">    &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;isNew?&lt;/td&gt;&lt;td&gt;&lt;%=isNew%&gt;&lt;/td&gt;</span><br><span class="line">    &lt;/tr&gt;</span><br><span class="line">    &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;Creation Time&lt;/td&gt;&lt;td&gt;&lt;%=new Date(creationTime)%&gt;&lt;/td&gt;</span><br><span class="line">    &lt;/tr&gt;</span><br><span class="line">    &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;Last Accessed Time&lt;/td&gt;&lt;td&gt;&lt;%=new Date(lastAccessedTime)%&gt;&lt;/td&gt;</span><br><span class="line">    &lt;/tr&gt;</span><br><span class="line">    &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;Max Inactive Interval&lt;/td&gt;&lt;td&gt;&lt;%=maxInactiveInterval%&gt; sec&lt;/td&gt;</span><br><span class="line">    &lt;/tr&gt;</span><br><span class="line">&lt;/table&gt;</span><br></pre></td></tr></table></figure>
+<p>화면 결과는 다음과 같이 나왔다<br><img src="/images/refer/session/session-capture.png" alt="세션캡쳐"><em>세션캡쳐</em></p>
+<p>Session ID값 맨뒤를 보면 “.AP1_servlet_engine1” 처럼 뒤에 컨테이너 엔진이름이 붙어서 나온다<br>여러번 요청해보니 세션이 유지된 상태에서는 계속 같은 1번엔진으로 요청이 가는걸 확인할 수 있었다.</p>
+<h2 id="HttpSession과-JVM-Constant-Pool"><a href="#HttpSession과-JVM-Constant-Pool" class="headerlink" title="HttpSession과 JVM Constant Pool"></a>HttpSession과 JVM Constant Pool</h2><p>의문점 2번.<br>같은 JVM 메모리를 참조하는건 알았다. 그런데 author == “admin” 연산은 어떻게 일관성있는 결과가 나오는걸까?</p>
+<p>session.getAttribute(“author”) 메소드를 호출하면 HttpSession은 내부적으로 가지고 있는  ConcurrentHashMap.get(“author”)을 호출한다.<br>결과적으로 ConcurrentHashMap이 가지고있는 value값이 항상 같은 참조를 리턴해야 일관성있는 비교가 가능하다는 결론이 나온다.<br>서버에 세션을 저장하기 위해서 session.setAttribute(“author”, “amdin”) 하면 내부적으로 다음 코드가 실행될 것이다.</p>
+<p><code>test.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap&lt;String, String&gt; sessionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">sessionMap.put(<span class="string">&quot;auth&quot;</span>, <span class="string">&quot;admin&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>컴파일 후에 javap를 이용하여 바이트코드를 확인해보자</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javap -v test.class</span><br></pre></td></tr></table></figure>
+<p>그럼 다음과 같은 결과가 나온다.<br><img src="/images/refer/session/constant-pool-complie.png" alt="javap"><em>contant pool 확인</em></p>
+<p>#21을 보면 contant pool에 “admin”이 저장되는걸 알 수 있다.</p>
+<blockquote>
+<p>JVM은 String 같은 상수를 담아놓는 contant pool이란 공간이 따로있다.<br>여기서는 contant pool에 대해서 따로 다루지 않겠다. 검색해보면 많이 나온다 ^^;</p>
+</blockquote>
+<p>다른 세션객체에서 같은 contant pool의 참조를 가지고 있기 때문에 같은 결과가 나올 수 있었던 것이다.</p>
+<p><img src="/images/refer/session/jvm-constantpool.png" alt="jvm-memory"></p>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text"></span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%EA%B0%9C%EC%9A%94"><span class="toc-number">1.1.</span> <span class="toc-text">개요</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EC%9D%98%EB%AC%B8%EC%A0%90"><span class="toc-number">1.2.</span> <span class="toc-text">의문점</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EC%84%B8%EC%85%98-%ED%8A%B8%EB%9E%98%ED%82%B9-Session-Tracking-%EB%8F%99%EC%9E%91%EB%B0%A9%EC%8B%9D"><span class="toc-number">1.3.</span> <span class="toc-text">세션 트래킹(Session Tracking) 동작방식</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session-Routing-Test"><span class="toc-number">1.4.</span> <span class="toc-text">Session Routing Test</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HttpSession%EA%B3%BC-JVM-Constant-Pool"><span class="toc-number">1.5.</span> <span class="toc-text">HttpSession과 JVM Constant Pool</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&text=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&is_video=false&description=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=세션 클러스터링(Session Clustering)과 JVM Memory&body=Check out this article: https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&title=세션 클러스터링(Session Clustering)과 JVM Memory"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/04/02/jeus-session-tracking-in-cluster/&name=세션 클러스터링(Session Clustering)과 JVM Memory&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Jo Yeoung Duk
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+
+
+    <!-- Disqus Comments -->
+    <script type="text/javascript">
+        var disqus_shortname = 'timpac';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
