@@ -18,10 +18,10 @@
 <meta property="og:image" content="https://timpac31.github.io/images/refer/session/session-routing-second.png">
 <meta property="og:image" content="https://timpac31.github.io/images/refer/session/session_server.png">
 <meta property="og:image" content="https://timpac31.github.io/images/refer/session/session-capture.png">
-<meta property="og:image" content="https://timpac31.github.io/images/refer/session/constant-pool-complie.png">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/session/constant-pool-complie.PNG">
 <meta property="og:image" content="https://timpac31.github.io/images/refer/session/jvm-constantpool.png">
 <meta property="article:published_time" content="2021-04-02T02:47:54.000Z">
-<meta property="article:modified_time" content="2021-04-02T11:04:04.046Z">
+<meta property="article:modified_time" content="2021-04-06T10:37:29.894Z">
 <meta property="article:author" content="Jo Yeoung Duk">
 <meta property="article:tag" content="JAVA">
 <meta property="article:tag" content="Session">
@@ -180,7 +180,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap&lt;String, String&gt; sessionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">sessionMap.put(<span class="string">&quot;auth&quot;</span>, <span class="string">&quot;admin&quot;</span>)</span><br></pre></td></tr></table></figure>
 <p>컴파일 후에 javap를 이용하여 바이트코드를 확인해보자</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javap -v test.class</span><br></pre></td></tr></table></figure>
-<p>그럼 다음과 같은 결과가 나온다.<br><img src="/images/refer/session/constant-pool-complie.png" alt="javap"><em>contant pool 확인</em></p>
+<p>그럼 다음과 같은 결과가 나온다.<br><img src="/images/refer/session/constant-pool-complie.PNG" alt="javap"><em>contant pool 확인</em></p>
 <p>#21을 보면 contant pool에 “admin”이 저장되는걸 알 수 있다.</p>
 <blockquote>
 <p>JVM은 String 같은 상수를 담아놓는 contant pool이란 공간이 따로있다.<br>여기서는 contant pool에 대해서 따로 다루지 않겠다. 검색해보면 많이 나온다 ^^;</p>
