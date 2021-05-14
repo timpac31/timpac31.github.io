@@ -776,7 +776,7 @@ body {
   text-align: right;
   margin-top: 1rem;
   padding-right: 2rem;
-  max-width: 20em;
+  max-width: 18em;
   float: right;
   overflow: auto;
   max-height: calc(95vh - 7rem);
