@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang=ko>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="1. Optional 변수에 null을 할당하지 마라1234567891011&#x2F;&#x2F; AVOIDpublic Optional&lt;Cart&gt; fetchCart() &amp;#123;    Optional&lt;Cart&gt; emptyCart &#x3D; null;    ...&amp;#125;&#x2F;&#x2F; PREPERpublic Optional&lt;Cart&gt; fetchCart()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java Optional Best Practices">
+<meta property="og:url" content="https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/index.html">
+<meta property="og:site_name" content="Timpac&#39;s Blog">
+<meta property="og:description" content="1. Optional 변수에 null을 할당하지 마라1234567891011&#x2F;&#x2F; AVOIDpublic Optional&lt;Cart&gt; fetchCart() &amp;#123;    Optional&lt;Cart&gt; emptyCart &#x3D; null;    ...&amp;#125;&#x2F;&#x2F; PREPERpublic Optional&lt;Cart&gt; fetchCart()">
+<meta property="og:locale" content="ko_KR">
+<meta property="article:published_time" content="2021-05-14T11:10:51.000Z">
+<meta property="article:modified_time" content="2021-05-14T11:16:08.936Z">
+<meta property="article:author" content="Jo Yeoung Duk">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="Practice">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Java Optional Best Practices</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2021/04/02/jeus-session-tracking-in-cluster/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&text=Java Optional Best Practices"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&is_video=false&description=Java Optional Best Practices"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java Optional Best Practices&body=Check out this article: https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&name=Java Optional Best Practices&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Optional-%EB%B3%80%EC%88%98%EC%97%90-null%EC%9D%84-%ED%95%A0%EB%8B%B9%ED%95%98%EC%A7%80-%EB%A7%88%EB%9D%BC"><span class="toc-number">1.</span> <span class="toc-text">1. Optional 변수에 null을 할당하지 마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Optional-get-%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-%EC%A0%84%EC%97%90%EB%8A%94-%EB%B0%98%EB%93%9C%EC%8B%9C-Optional%EC%97%90-%EA%B0%92%EC%9D%B4-%EC%9E%88%EB%8A%94%EC%A7%80-%ED%99%95%EC%9D%B8%ED%95%B4%EB%9D%BC"><span class="toc-number">2.</span> <span class="toc-text">2. Optional.get()을 사용하기 전에는 반드시 Optional에 값이 있는지 확인해라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-isPresent-get-%EB%B3%B4%EB%8B%A4%EB%8A%94-orElse"><span class="toc-number">3.</span> <span class="toc-text">3. isPresent()-get() 보다는 orElse()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-orElseGet"><span class="toc-number">4.</span> <span class="toc-text">4. orElseGet()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-orElseThrow"><span class="toc-number">5.</span> <span class="toc-text">5. orElseThrow()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-Optional-ifPresent"><span class="toc-number">6.</span> <span class="toc-text">6. Optional.ifPresent()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-lamda-%EC%82%AC%EC%9A%A9%EC%9C%BC%EB%A1%9C-Optional-%EC%96%BB%EA%B8%B0"><span class="toc-number">7.</span> <span class="toc-text">7. lamda 사용으로 Optional 얻기</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Optional%EC%9D%98-%EA%B3%BC%EB%8F%84%ED%95%9C-%EC%82%AC%EC%9A%A9"><span class="toc-number">8.</span> <span class="toc-text">8. Optional의 과도한 사용</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%ED%95%84%EB%93%9C-%EC%84%A0%EC%96%B8%EC%97%90-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">9.</span> <span class="toc-text">9. 필드 선언에 사용하지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%EC%83%9D%EC%84%B1%EC%9E%90-%EB%A9%94%EC%84%9C%EB%93%9C-Setter-%EC%9D%B8%EC%9E%90%EB%A1%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">10.</span> <span class="toc-text">10. 생성자, 메서드, Setter 인자로 사용하지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-%EB%B9%88-Collection%EC%9D%B4%EB%82%98-Array%EB%A5%BC-%EB%A6%AC%ED%84%B4%ED%95%A0-%EB%95%8C-Optional%EC%9D%84-%EC%93%B0%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">11.</span> <span class="toc-text">11. 빈 Collection이나 Array를 리턴할 때 Optional을 쓰지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%EA%B8%B0%EB%B3%B8%EC%9E%90%EB%A3%8C%ED%98%95%EC%97%90-Optional-%EC%A0%9C%EB%84%A4%EB%A6%AD%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">12.</span> <span class="toc-text">12. 기본자료형에 Optional 제네릭을 사용하지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%EB%8F%99%EB%93%B1%EC%84%B1-Equality-%EB%B9%84%EA%B5%90%EB%A5%BC-%EC%9C%84%ED%95%B4-unWrap%ED%95%A0-%ED%95%84%EC%9A%94%EA%B0%80%EC%97%86%EB%8B%A4"><span class="toc-number">13.</span> <span class="toc-text">13. 동등성(Equality) 비교를 위해 unWrap할 필요가없다.</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-Optional-%EA%B0%92%EC%9D%84-%EB%B3%80%EA%B2%BD%ED%95%98%EA%B1%B0%EB%82%98-%ED%95%84%ED%84%B0%EB%A7%81%ED%95%A0-%EB%95%8C%EB%8A%94-%EC%8A%A4%ED%8A%B8%EB%A6%BC-API%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%9E%90"><span class="toc-number">14.</span> <span class="toc-text">14. Optional 값을 변경하거나 필터링할 때는 스트림 API를 이용하자</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-indentity-%EA%B8%B0%EB%B0%98-%EC%97%B0%EC%82%B0%EC%9D%84-%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">15.</span> <span class="toc-text">15. indentity 기반 연산을 하지마라</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Java Optional Best Practices
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Timpac's Blog</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2021-05-14T11:10:51.000Z" itemprop="datePublished">2021-05-14</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/JAVA/" rel="tag">JAVA</a>, <a class="tag-link-link" href="/tags/Practice/" rel="tag">Practice</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-Optional-변수에-null을-할당하지-마라"><a href="#1-Optional-변수에-null을-할당하지-마라" class="headerlink" title="1. Optional 변수에 null을 할당하지 마라"></a>1. Optional 변수에 null을 할당하지 마라</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVOID</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Optional&lt;Cart&gt; <span class="title">fetchCart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Optional&lt;Cart&gt; emptyCart = <span class="keyword">null</span>;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREPER</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Optional&lt;Cart&gt; <span class="title">fetchCart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Optional&lt;Cart&gt; emptyCart = Optional.empty();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>빈값으로 초기화하려면 Optional.empty()를 사용하자.</p>
+<h2 id="2-Optional-get-을-사용하기-전에는-반드시-Optional에-값이-있는지-확인해라"><a href="#2-Optional-get-을-사용하기-전에는-반드시-Optional에-값이-있는지-확인해라" class="headerlink" title="2. Optional.get()을 사용하기 전에는 반드시 Optional에 값이 있는지 확인해라"></a>2. Optional.get()을 사용하기 전에는 반드시 Optional에 값이 있는지 확인해라</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVOID</span></span><br><span class="line">Optional&lt;Cart&gt; cart = CartRepository.findOne();</span><br><span class="line">Cart myCart = cart.get();</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREPER</span></span><br><span class="line">Optional&lt;Cart&gt; cart = CartRepository.findOne();</span><br><span class="line"><span class="keyword">if</span>(cart.isPresent()) &#123;</span><br><span class="line">    Cart myCart = cart.get();</span><br><span class="line">&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//값이 없을 때</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>cart값이 없으면 cart.get()은 에러를 발생시킨다. 그래서 항상 get() 호출 이전에 isPresent()로 체크를 해줘야한다. Optional이 생긴이유가 null check에서 벗어나기 위함인데 이렇게 사용한다면 결국 다를게 없다. 아래에 나오는 orElse()나 orElseGet()을 사용하자.</p>
+</blockquote>
+<h2 id="3-isPresent-get-보다는-orElse"><a href="#3-isPresent-get-보다는-orElse" class="headerlink" title="3. isPresent()-get() 보다는 orElse()"></a>3. isPresent()-get() 보다는 orElse()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String USER_STATUS = <span class="string">&quot;UNKNOWN&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AVOID</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">findUserStatus</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">    Optional&lt;String&gt; status = ... ;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (status.isPresent()) &#123;</span><br><span class="line">        <span class="keyword">return</span> status.get();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> USER_STATUS;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREPER</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">findUserStatus</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">    Optional&lt;String&gt; status = ... ;</span><br><span class="line">    <span class="keyword">return</span> status.orElse(USER_STATUS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-orElseGet"><a href="#4-orElseGet" class="headerlink" title="4. orElseGet()"></a>4. orElseGet()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">computeStatus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// status를 계산하여 리턴하는 로직</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AVOID</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">findUserStatus</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">    Optional&lt;String&gt; status = ... ;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (status.isPresent()) &#123;</span><br><span class="line">        <span class="keyword">return</span> status.get();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> computeStatus();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AVOID</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">findUserStatus</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">    Optional&lt;String&gt; status = ... ;</span><br><span class="line">    status.orElse(computeStatus());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREPER</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">findUserStatus</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">    Optional&lt;String&gt; status = ... ;</span><br><span class="line">    <span class="keyword">return</span> status.orElseGet(<span class="keyword">this</span>::computeStatus);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>첫번째 AVOID는 isPresent()-get()을 피하라는 것이고, 두번째 AVOID는 얼핏보면 문제 없을 것 같지만 orElse()는 status에 값이 있어도 computeStatus()메소드를 호출하기 때문에 orElseGet()을 쓰는 것이 좋다.</p>
+</blockquote>
+<h2 id="5-orElseThrow"><a href="#5-orElseThrow" class="headerlink" title="5. orElseThrow()"></a>5. orElseThrow()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVOID</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">findUserStatus</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">    Optional&lt;String&gt; status = ... ;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (status.isPresent()) &#123;</span><br><span class="line">        <span class="keyword">return</span> status.get();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException();        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">findUserStatus</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;</span><br><span class="line">    Optional&lt;String&gt; status = ... ;</span><br><span class="line">    <span class="keyword">return</span> status.orElseThrow();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>orElseThrow()는 Java 10부터 사용가능하다.<br> 이하 버전은 orElseThrow(Supplier&lt;? extends X&gt; exceptionSupplier)를 사용해야한다.</p>
+</blockquote>
+<h2 id="6-Optional-ifPresent"><a href="#6-Optional-ifPresent" class="headerlink" title="6. Optional.ifPresent()"></a>6. Optional.ifPresent()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVOID</span></span><br><span class="line">Optional&lt;String&gt; status = ... ;</span><br><span class="line"><span class="keyword">if</span> (status.isPresent()) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Status: &quot;</span> + status.get());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line">Optional&lt;String&gt; status ... ;</span><br><span class="line">status.ifPresent(System.out::println); </span><br></pre></td></tr></table></figure>
+<h2 id="7-lamda-사용으로-Optional-얻기"><a href="#7-lamda-사용으로-Optional-얻기" class="headerlink" title="7. lamda 사용으로 Optional 얻기"></a>7. lamda 사용으로 Optional 얻기</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Product&gt; products = ... ;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AVOID</span></span><br><span class="line">Optional&lt;Product&gt; product = products.stream()</span><br><span class="line">    .filter(p -&gt; p.getPrice() &lt; price)</span><br><span class="line">    .findFirst();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (product.isPresent()) &#123;</span><br><span class="line">    <span class="keyword">return</span> product.get().getName();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;NOT FOUND&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line"><span class="keyword">return</span> products.stream()</span><br><span class="line">    .filter(p -&gt; p.getPrice() &lt; price)</span><br><span class="line">    .findFirst()</span><br><span class="line">    .map(Product::getName)</span><br><span class="line">    .orElse(<span class="string">&quot;NOT FOUND&quot;</span>);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Stream 의 findFirst(), findAny(), reduce() 같은 메소드는 Optional을 리턴한다. 적절히 사용하면<br>코드의 분리없이 메소드 체이닝을할 수 있다.</p>
+</blockquote>
+<h2 id="8-Optional의-과도한-사용"><a href="#8-Optional의-과도한-사용" class="headerlink" title="8. Optional의 과도한 사용"></a>8. Optional의 과도한 사용</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVIOD</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">fetchStatus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String status = ... ;</span><br><span class="line">    <span class="keyword">return</span> Optional.ofNullable(status).orElse(<span class="string">&quot;PENDING&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">fetchStatus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String status = ... ;</span><br><span class="line">    <span class="keyword">return</span> status == <span class="keyword">null</span> ? <span class="string">&quot;PENDING&quot;</span> : status;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>단순 값을 가져오는 메서드에 Optional을 사용하는 것은 Optional의 목적에 맞지않는 과도한 사용이다.</p>
+</blockquote>
+<h2 id="9-필드-선언에-사용하지마라"><a href="#9-필드-선언에-사용하지마라" class="headerlink" title="9. 필드 선언에 사용하지마라"></a>9. 필드 선언에 사용하지마라</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVIOD</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Customer</span> </span>&#123;</span><br><span class="line">    Optioanl&lt;String&gt; zip;</span><br><span class="line">    Optioanl&lt;String&gt; zip = Optional.empty();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Customer</span> </span>&#123;</span><br><span class="line">    String zip;</span><br><span class="line">    String zip = <span class="string">&quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="10-생성자-메서드-Setter-인자로-사용하지마라"><a href="#10-생성자-메서드-Setter-인자로-사용하지마라" class="headerlink" title="10. 생성자, 메서드, Setter 인자로 사용하지마라"></a>10. 생성자, 메서드, Setter 인자로 사용하지마라</h2><h2 id="11-빈-Collection이나-Array를-리턴할-때-Optional을-쓰지마라"><a href="#11-빈-Collection이나-Array를-리턴할-때-Optional을-쓰지마라" class="headerlink" title="11. 빈 Collection이나 Array를 리턴할 때 Optional을 쓰지마라"></a>11. 빈 Collection이나 Array를 리턴할 때 Optional을 쓰지마라</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVIOD</span></span><br><span class="line"><span class="keyword">public</span> Optional&lt;List&lt;String&gt;&gt; fetchCartItems() &#123;</span><br><span class="line">    List&lt;String&gt; items = cart.getItems();</span><br><span class="line">    <span class="keyword">return</span> Optional.ofNullable(items);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">fetchCartItems</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; items = cart.getItems();</span><br><span class="line">    <span class="keyword">return</span> items == <span class="keyword">null</span> ? Collections.emptyList() : items;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="12-기본자료형에-Optional-제네릭을-사용하지마라"><a href="#12-기본자료형에-Optional-제네릭을-사용하지마라" class="headerlink" title="12. 기본자료형에 Optional 제네릭을 사용하지마라"></a>12. 기본자료형에 Optional<T> 제네릭을 사용하지마라</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AVIOD</span></span><br><span class="line">Optional&lt;Integer&gt; price = Optional.of(<span class="number">50</span>);</span><br><span class="line">Optional&lt;Long&gt; price = Optional.of(<span class="number">50L</span>);</span><br><span class="line">Optional&lt;Double&gt; price = Optional.of(<span class="number">50.43d</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line">OptionalInt price = OptionalInt.of(<span class="number">50</span>);</span><br><span class="line">OptionalLong price = OptionalLong.of(<span class="number">50L</span>);</span><br><span class="line">OptionalDouble price = OptionalDouble.of(<span class="number">50.43d</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="13-동등성-Equality-비교를-위해-unWrap할-필요가없다"><a href="#13-동등성-Equality-비교를-위해-unWrap할-필요가없다" class="headerlink" title="13. 동등성(Equality) 비교를 위해 unWrap할 필요가없다."></a>13. 동등성(Equality) 비교를 위해 unWrap할 필요가없다.</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Optional&lt;String&gt; actual = Optional.of(<span class="string">&quot;shoes&quot;</span>);</span><br><span class="line">Optional&lt;String&gt; expected = Optional.of(<span class="string">&quot;shoes&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// AVIOD</span></span><br><span class="line">assertEquals(expected.get(), actual.get());</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line">assertEquals(expected, actual);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Optional의 equals 메소드는 내부 값을 비교하도록 구현되어있기 때문에 바로 비교하면된다.</p>
+</blockquote>
+<h2 id="14-Optional-값을-변경하거나-필터링할-때는-스트림-API를-이용하자"><a href="#14-Optional-값을-변경하거나-필터링할-때는-스트림-API를-이용하자" class="headerlink" title="14. Optional 값을 변경하거나 필터링할 때는 스트림 API를 이용하자"></a>14. Optional 값을 변경하거나 필터링할 때는 스트림 API를 이용하자</h2><ul>
+<li>map()<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Optional&lt;String&gt; lowerName = Optional.of(<span class="string">&quot;optional&quot;</span>);</span><br><span class="line">Optional&lt;String&gt; upperName;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AVIOD</span></span><br><span class="line"><span class="keyword">if</span>(lowerName.isPresent()) &#123;</span><br><span class="line">    upperName = Optional.of(lowerName.get().toUpperCase());</span><br><span class="line">&#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    upperName = Optional.empty();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line">upperName = lowerName.map(String::toUpperCase);</span><br></pre></td></tr></table></figure></li>
+<li>filter, flatMap()<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String uppercase = items.stream()</span><br><span class="line">	.filter(i -&gt; i.getPrice() &gt; <span class="number">50</span>)</span><br><span class="line">    .findFirst()</span><br><span class="line">    .flatMap(i -&gt; Optional.of(i.getName()))</span><br><span class="line">    .map(String::toUpperCase).orElse(<span class="string">&quot;NOT FOUND&quot;</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="15-indentity-기반-연산을-하지마라"><a href="#15-indentity-기반-연산을-하지마라" class="headerlink" title="15. indentity 기반 연산을 하지마라"></a>15. indentity 기반 연산을 하지마라</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Product product = <span class="keyword">new</span> Product();</span><br><span class="line">Optional&lt;Product&gt; op1 = Optional.of(product);</span><br><span class="line">Optional&lt;Product&gt; op2 = Optional.of(product);</span><br><span class="line"></span><br><span class="line"><span class="comment">// AVOID</span></span><br><span class="line"><span class="keyword">if</span> (op1 == op2) &#123; </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// PREFER</span></span><br><span class="line"><span class="keyword">if</span> (op1.equals(op2)) &#123; </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// NEVER DO</span></span><br><span class="line"><span class="keyword">synchronized</span>(op1) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Optional은 Value-based class 이므로 equality (==), identity hash-based, synchronization 연산을 하면 예상과 다르게 동작될 수 있다. equals()를 사용하자.</p>
+</blockquote>
+</li>
+</ul>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Optional-%EB%B3%80%EC%88%98%EC%97%90-null%EC%9D%84-%ED%95%A0%EB%8B%B9%ED%95%98%EC%A7%80-%EB%A7%88%EB%9D%BC"><span class="toc-number">1.</span> <span class="toc-text">1. Optional 변수에 null을 할당하지 마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Optional-get-%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-%EC%A0%84%EC%97%90%EB%8A%94-%EB%B0%98%EB%93%9C%EC%8B%9C-Optional%EC%97%90-%EA%B0%92%EC%9D%B4-%EC%9E%88%EB%8A%94%EC%A7%80-%ED%99%95%EC%9D%B8%ED%95%B4%EB%9D%BC"><span class="toc-number">2.</span> <span class="toc-text">2. Optional.get()을 사용하기 전에는 반드시 Optional에 값이 있는지 확인해라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-isPresent-get-%EB%B3%B4%EB%8B%A4%EB%8A%94-orElse"><span class="toc-number">3.</span> <span class="toc-text">3. isPresent()-get() 보다는 orElse()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-orElseGet"><span class="toc-number">4.</span> <span class="toc-text">4. orElseGet()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-orElseThrow"><span class="toc-number">5.</span> <span class="toc-text">5. orElseThrow()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-Optional-ifPresent"><span class="toc-number">6.</span> <span class="toc-text">6. Optional.ifPresent()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-lamda-%EC%82%AC%EC%9A%A9%EC%9C%BC%EB%A1%9C-Optional-%EC%96%BB%EA%B8%B0"><span class="toc-number">7.</span> <span class="toc-text">7. lamda 사용으로 Optional 얻기</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Optional%EC%9D%98-%EA%B3%BC%EB%8F%84%ED%95%9C-%EC%82%AC%EC%9A%A9"><span class="toc-number">8.</span> <span class="toc-text">8. Optional의 과도한 사용</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%ED%95%84%EB%93%9C-%EC%84%A0%EC%96%B8%EC%97%90-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">9.</span> <span class="toc-text">9. 필드 선언에 사용하지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%EC%83%9D%EC%84%B1%EC%9E%90-%EB%A9%94%EC%84%9C%EB%93%9C-Setter-%EC%9D%B8%EC%9E%90%EB%A1%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">10.</span> <span class="toc-text">10. 생성자, 메서드, Setter 인자로 사용하지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-%EB%B9%88-Collection%EC%9D%B4%EB%82%98-Array%EB%A5%BC-%EB%A6%AC%ED%84%B4%ED%95%A0-%EB%95%8C-Optional%EC%9D%84-%EC%93%B0%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">11.</span> <span class="toc-text">11. 빈 Collection이나 Array를 리턴할 때 Optional을 쓰지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%EA%B8%B0%EB%B3%B8%EC%9E%90%EB%A3%8C%ED%98%95%EC%97%90-Optional-%EC%A0%9C%EB%84%A4%EB%A6%AD%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">12.</span> <span class="toc-text">12. 기본자료형에 Optional 제네릭을 사용하지마라</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%EB%8F%99%EB%93%B1%EC%84%B1-Equality-%EB%B9%84%EA%B5%90%EB%A5%BC-%EC%9C%84%ED%95%B4-unWrap%ED%95%A0-%ED%95%84%EC%9A%94%EA%B0%80%EC%97%86%EB%8B%A4"><span class="toc-number">13.</span> <span class="toc-text">13. 동등성(Equality) 비교를 위해 unWrap할 필요가없다.</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-Optional-%EA%B0%92%EC%9D%84-%EB%B3%80%EA%B2%BD%ED%95%98%EA%B1%B0%EB%82%98-%ED%95%84%ED%84%B0%EB%A7%81%ED%95%A0-%EB%95%8C%EB%8A%94-%EC%8A%A4%ED%8A%B8%EB%A6%BC-API%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%9E%90"><span class="toc-number">14.</span> <span class="toc-text">14. Optional 값을 변경하거나 필터링할 때는 스트림 API를 이용하자</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-indentity-%EA%B8%B0%EB%B0%98-%EC%97%B0%EC%82%B0%EC%9D%84-%ED%95%98%EC%A7%80%EB%A7%88%EB%9D%BC"><span class="toc-number">15.</span> <span class="toc-text">15. indentity 기반 연산을 하지마라</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&text=Java Optional Best Practices"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&is_video=false&description=Java Optional Best Practices"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java Optional Best Practices&body=Check out this article: https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&title=Java Optional Best Practices"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/05/14/Java-Optional-Best-Practices/&name=Java Optional Best Practices&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Jo Yeoung Duk
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+
+
+    <!-- Disqus Comments -->
+    <script type="text/javascript">
+        var disqus_shortname = 'timpac';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
