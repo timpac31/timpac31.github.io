@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="프로그램에서 읽기 어려고 복잡한 부분을 보면 주로 조건문이 많다.이번 Archives에선 코드의 가독성을 떨어뜨리는 악의 축 조건문을 물리치는(?) 방법을 알아보기로한다.우선 다음 막장 코드를 보자 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JAVA 조건문 때려잡기">
+<meta property="og:title" content="JAVA 조건문 리팩토링">
 <meta property="og:url" content="https://timpac31.github.io/2021/07/07/refactoring-condition/index.html">
 <meta property="og:site_name" content="Timpac&#39;s Blog">
 <meta property="og:description" content="프로그램에서 읽기 어려고 복잡한 부분을 보면 주로 조건문이 많다.이번 Archives에선 코드의 가독성을 떨어뜨리는 악의 축 조건문을 물리치는(?) 방법을 알아보기로한다.우선 다음 막장 코드를 보자 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484">
@@ -16,8 +16,10 @@
 <meta property="og:image" content="https://timpac31.github.io/images/refer/if/kong-godzilla.jpg">
 <meta property="og:image" content="https://timpac31.github.io/images/refer/if/course-uml.jpg">
 <meta property="article:published_time" content="2021-07-07T11:46:17.000Z">
-<meta property="article:modified_time" content="2021-07-07T12:30:54.310Z">
+<meta property="article:modified_time" content="2021-07-07T12:40:29.415Z">
 <meta property="article:author" content="Jo Yeoung Duk">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="Refactoring">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://timpac31.github.io/images/refer/if/kong-godzilla.jpg">
     
@@ -39,7 +41,7 @@
         
     
     <!-- title -->
-    <title>JAVA 조건문 때려잡기</title>
+    <title>JAVA 조건문 리팩토링</title>
     <!-- styles -->
     
 <link rel="stylesheet" href="/css/style.css">
@@ -88,15 +90,15 @@
     <div id="share" style="display: none">
       <ul>
   <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/07/07/refactoring-condition/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&text=JAVA 조건문 때려잡기"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&is_video=false&description=JAVA 조건문 때려잡기"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=JAVA 조건문 때려잡기&body=Check out this article: https://timpac31.github.io/2021/07/07/refactoring-condition/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&name=JAVA 조건문 때려잡기&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&text=JAVA 조건문 리팩토링"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&is_video=false&description=JAVA 조건문 리팩토링"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JAVA 조건문 리팩토링&body=Check out this article: https://timpac31.github.io/2021/07/07/refactoring-condition/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&name=JAVA 조건문 리팩토링&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -113,7 +115,7 @@
   <header>
     
     <h1 class="posttitle" itemprop="name headline">
-        JAVA 조건문 때려잡기
+        JAVA 조건문 리팩토링
     </h1>
 
 
@@ -129,6 +131,11 @@
 
 
       
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/JAVA/" rel="tag">JAVA</a>, <a class="tag-link-link" href="/tags/Refactoring/" rel="tag">Refactoring</a>
+    </div>
+
 
     </div>
   </header>
@@ -221,15 +228,15 @@
     <div id="share-footer" style="display: none">
       <ul>
   <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2021/07/07/refactoring-condition/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&text=JAVA 조건문 때려잡기"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&is_video=false&description=JAVA 조건문 때려잡기"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=JAVA 조건문 때려잡기&body=Check out this article: https://timpac31.github.io/2021/07/07/refactoring-condition/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 때려잡기"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&name=JAVA 조건문 때려잡기&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&text=JAVA 조건문 리팩토링"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&is_video=false&description=JAVA 조건문 리팩토링"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JAVA 조건문 리팩토링&body=Check out this article: https://timpac31.github.io/2021/07/07/refactoring-condition/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&title=JAVA 조건문 리팩토링"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2021/07/07/refactoring-condition/&name=JAVA 조건문 리팩토링&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
