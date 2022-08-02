@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang=ko>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Recursion아래 예제를 보자. 1부터 N까지 합을 구하는 재귀함수다. 123int sum(int n) &amp;#123;	return n &lt;&#x3D; 1 ? n : n + sum(n-1);&amp;#125; sum(100); 을 실행하면 결과 값 5050이 잘 리턴된다. 하지만 큰 숫자를 넣고 실행하면 어떻게 될까? sum(100000); 을 실행하면 우리에게 익숙한">
+<meta property="og:type" content="article">
+<meta property="og:title" content="자바 재귀함수 꼬리물기 최적화">
+<meta property="og:url" content="https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/index.html">
+<meta property="og:site_name" content="Timpac&#39;s Blog">
+<meta property="og:description" content="Recursion아래 예제를 보자. 1부터 N까지 합을 구하는 재귀함수다. 123int sum(int n) &amp;#123;	return n &lt;&#x3D; 1 ? n : n + sum(n-1);&amp;#125; sum(100); 을 실행하면 결과 값 5050이 잘 리턴된다. 하지만 큰 숫자를 넣고 실행하면 어떻게 될까? sum(100000); 을 실행하면 우리에게 익숙한">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/stackoverflow.png">
+<meta property="article:published_time" content="2022-08-02T11:27:08.000Z">
+<meta property="article:modified_time" content="2022-08-02T11:59:29.220Z">
+<meta property="article:author" content="Jo Yeoung Duk">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://timpac31.github.io/images/refer/stackoverflow.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>자바 재귀함수 꼬리물기 최적화</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2022/06/25/Sync-ASync-Block-NonBlock/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&text=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&is_video=false&description=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=자바 재귀함수 꼬리물기 최적화&body=Check out this article: https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&name=자바 재귀함수 꼬리물기 최적화&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Recursion"><span class="toc-number">1.</span> <span class="toc-text">Recursion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Recursion-And-Stack-in-Java"><span class="toc-number">2.</span> <span class="toc-text">Recursion And Stack in Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-Call-Elimination-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94"><span class="toc-number">3.</span> <span class="toc-text">Tail Call Elimination (꼬리물기 최적화)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-Call-Elimination-in-Java"><span class="toc-number">4.</span> <span class="toc-text">Tail Call Elimination in Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#reference"><span class="toc-number">5.</span> <span class="toc-text">reference</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        자바 재귀함수 꼬리물기 최적화
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Timpac's Blog</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2022-08-02T11:27:08.000Z" itemprop="datePublished">2022-08-02</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Recursion"><a href="#Recursion" class="headerlink" title="Recursion"></a>Recursion</h2><p>아래 예제를 보자. 1부터 N까지 합을 구하는 재귀함수다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> n &lt;= <span class="number">1</span> ? n : n + sum(n-<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>sum(100); 을 실행하면 결과 값 5050이 잘 리턴된다.</p>
+<p>하지만 큰 숫자를 넣고 실행하면 어떻게 될까?</p>
+<p>sum(100000); 을 실행하면 우리에게 익숙한 StactOverflowError가 발생한다. (컴퓨터마다 한계숫자는 차이가 있음)<br>십만은 컴퓨터에게 그리 큰 숫자가 아닌데 왜 메모리가 모자른걸까?</p>
+<p><img src="/images/refer/stackoverflow.png" alt="StackOverFlow"> <em>개발자라면 모두 아는 사이트</em></p>
+<h2 id="Recursion-And-Stack-in-Java"><a href="#Recursion-And-Stack-in-Java" class="headerlink" title="Recursion And Stack in Java"></a>Recursion And Stack in Java</h2><p>자바는 메소드가 호출될 때 현재 하고 있는 일을 중단하고(suspend) 현재 컨텍스트의 환경을 스택 메모리에 저장(push)한다. </p>
+<p>그리고 메소드가 리턴되었을 때 다시 스택에서 가져와(pop) 실행을 재개한다.(resume)</p>
+<p>위에서 큰 수를 넣었을 때 재귀함수가 반복적으로 호출되면서 스택에 계속 push만 되다보니 메모리 허용치를 넘어서 에러가 나는 것이였다. 스택메모리는 빠르지만 공간은 작다.</p>
+<p>현재 환경을 스택에 저장하는 이유는 메소드 호출 후에 돌아올 지점을 기억하고, 돌아와서 나머지 작업을 재개해야하기 때문이다. 그렇다면 반환 후 나머지 작업을 할 필요가 없을 경우엔 스택에 저장 할 필요가 없다는 것이 아닐까?? </p>
+<p>이처럼 재귀호출 부분을 맨 마지막 꼬리에 위치시키는 방법을 Tail Call Recursion(꼬리물기 재귀) 라고하며.<br>Tail Call Recursion을 했을 때 스택저장을 피하는 것을 TCE(Tail Call Elimination) 또는 TCO(Tail Call Optimization)라고 한다.<br>나머지 작업이 없기 때문에 스택에 저장할 필요가 없어진다.</p>
+<h2 id="Tail-Call-Elimination-꼬리물기-최적화"><a href="#Tail-Call-Elimination-꼬리물기-최적화" class="headerlink" title="Tail Call Elimination (꼬리물기 최적화)"></a>Tail Call Elimination (꼬리물기 최적화)</h2><p>정말 그런지 확인해보자 위의 sum 함수를 Tail Call Recursion으로 만들면 다음과 같다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> acc)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> n &lt;= <span class="number">1</span> ? acc : sum(n-<span class="number">1</span>, n+acc);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>처음에 나온 sum 함수는 내부에서 sum(n-1)을 호출한 후 + 연산을 재개해야 하기 때문에 Tail Call이 아니다.</p>
+<p>하지만 변경된 위의 예제는 마지막에 호출하고 뒤에 아무일도 하지 않기 때문에 tail call 이라고 할 수 있다.</p>
+<p>변경된 함수로 sum(100000); 을 실행해보자.. 역시나 에러가 나는 것을 볼 수 있다.</p>
+<p>불행히도 자바에서는 TCE가 구현되어 있지 않다. 함수형 언어같은 경우 위처럼 했을 때 최적화가되어 스택메모리에 저장이 안되지만 자바는 여전히 저장된다.</p>
+<h2 id="Tail-Call-Elimination-in-Java"><a href="#Tail-Call-Elimination-in-Java" class="headerlink" title="Tail Call Elimination in Java"></a>Tail Call Elimination in Java</h2><p>자바는 TCE가 지원되지 않지만 비슷하게 구현할 수는 있다.<br>먼저 TailCall 이라는 추상클래스를 만들고 3개의 추상메소드를 만든다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">TailCall</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> TailCall&lt;T&gt; <span class="title">resume</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> T <span class="title">eval</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isSuspend</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TailCall을 상속하는 두개의 클래스 Return, Suspend를 만든다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Return</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">TailCall</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> T t;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Return</span><span class="params">(T t)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.t = t;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> TailCall&lt;T&gt; <span class="title">resume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Return has no resume&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> T <span class="title">eval</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> t;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSuspend</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Suspend</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">TailCall</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Supplier&lt;TailCall&lt;T&gt;&gt; supplier;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> TailCall&lt;T&gt; <span class="title">resume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> supplier.get();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> T <span class="title">eval</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Suspend has no value&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSuspend</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TailCall을 사용하여 sum 함수를 수정하면 다음과 같다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">TailCall&lt;Integer&gt; <span class="title">sum</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> acc)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> n &lt;= <span class="number">1</span> ? <span class="keyword">new</span> TailCall.Return&lt;&gt;(acc) : <span class="keyword">new</span> TailCall.Suspend&lt;&gt;(() -&gt; sum(n-<span class="number">1</span>, n + acc));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>종료 조건이 되면 결과값을 담은 TailCall.Return 타입을 리턴하고,</p>
+<p>종료 조건이 아니면 TailCall.Suspend 타입을 리턴한다. Suspend를 생성할 때 생성자 인자로 supplier를 받는다. </p>
+<p>sum함수에서의 supplier는 () -&gt; sum(n-1, n + acc) 이다. </p>
+<p>재귀호출을 하는 함수이며 resume() 했을 때 다음에 호출될 TailCall을 가르키게된다. Linked List 구조와 비슷해보인다.</p>
+<p>사용법은 다음과 같다. 큰숫자를 넣고 실행해도 에러없이 잘 동작하는 것을 볼 수 있다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TailCall&lt;Integer&gt; tailCall = sum(<span class="number">100000</span>, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">while</span>(tailCall.isSuspend()) &#123;</span><br><span class="line">	tailCall = tailCall.resume();</span><br><span class="line">&#125;</span><br><span class="line">System.out.println(tailCall.eval());</span><br></pre></td></tr></table></figure>
+<p>TailCall<Integer> tailCall = sum(100000, 1); 을 실행해도 재귀적으로 함수를 바로 호출하지 않기 때문에 스택메모리가 쌓이지 않는다. 함수 호출 부분을 supplier로 선언하여 지연평가를 하기 때문이다.</p>
+<p>tailCall.resume(); 을 했을 때 비로소 평가되며 다음 TailCall을 반환한다.<br>결과적으로 스택메모리를 사용하는 대신 힙메모리를 사용하게되면서 StactOverflowError를 피할 수 있다.</p>
+<p>마지막으로 Suspend 인스턴스에서 바로 eval()을 사용할 수 있게 구현하고, 정적 팩토리 메서드 ret(), sus()를 구현하면 TailCall이 다음과 같이 완성된다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.function.Supplier;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">TailCall</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> TailCall&lt;T&gt; <span class="title">resume</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> T <span class="title">eval</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isSuspend</span><span class="params">()</span></span>;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Return&lt;T&gt; <span class="title">ret</span><span class="params">(T t)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> Return&lt;&gt;(t);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Suspend&lt;T&gt; <span class="title">sus</span><span class="params">(Supplier&lt;TailCall&lt;T&gt;&gt; s)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> Suspend&lt;&gt;(s);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Return</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">TailCall</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> T t;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Return</span><span class="params">(T t)</span> </span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.t = t;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> TailCall&lt;T&gt; <span class="title">resume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Return has no resume&quot;</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> T <span class="title">eval</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> t;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSuspend</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Suspend</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">TailCall</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> Supplier&lt;TailCall&lt;T&gt;&gt; supplier;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Suspend</span><span class="params">(Supplier&lt;TailCall&lt;T&gt;&gt; supplier)</span> </span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.supplier = supplier;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> TailCall&lt;T&gt; <span class="title">resume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> supplier.get();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> T <span class="title">eval</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			TailCall&lt;T&gt; curr = <span class="keyword">this</span>;</span><br><span class="line">			<span class="keyword">while</span>(curr.isSuspend()) &#123;</span><br><span class="line">				curr = curr.resume();</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> curr.eval();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSuspend</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>사용 코드</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">TailCall&lt;Integer&gt; <span class="title">sumRecur</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> acc)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> n &lt;= <span class="number">1</span> ? TailCall.ret(acc) : TailCall.sus(() -&gt; sumRecur(n-<span class="number">1</span>, n + acc));</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> sumRecur(n, <span class="number">1</span>).eval();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">System.out.println(sum(<span class="number">100000</span>));</span><br></pre></td></tr></table></figure>
+<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><p><a target="_blank" rel="noopener" href="https://search.shopping.naver.com/book/catalog/32473004775?cat_id=50005740&frm=PBOKPRO&query=functional+programming+in+java&NaPm=ct=l65369hs%7Cci=4972220061a063cb65177d4359f709c0c85b86d0%7Ctr=boknx%7Csn=95694%7Chk=0878174e456c7c4ee1d9ce0150e03f7e2218c65c">Functional Programming in Java</a></p>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Recursion"><span class="toc-number">1.</span> <span class="toc-text">Recursion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Recursion-And-Stack-in-Java"><span class="toc-number">2.</span> <span class="toc-text">Recursion And Stack in Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-Call-Elimination-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94"><span class="toc-number">3.</span> <span class="toc-text">Tail Call Elimination (꼬리물기 최적화)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tail-Call-Elimination-in-Java"><span class="toc-number">4.</span> <span class="toc-text">Tail Call Elimination in Java</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#reference"><span class="toc-number">5.</span> <span class="toc-text">reference</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&text=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&is_video=false&description=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=자바 재귀함수 꼬리물기 최적화&body=Check out this article: https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&title=자바 재귀함수 꼬리물기 최적화"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2022/08/02/%EC%9E%90%EB%B0%94-%EC%9E%AC%EA%B7%80%ED%95%A8%EC%88%98-%EA%BC%AC%EB%A6%AC%EB%AC%BC%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94/&name=자바 재귀함수 꼬리물기 최적화&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2022 Jo Yeoung Duk
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+
+
+    <!-- Disqus Comments -->
+    <script type="text/javascript">
+        var disqus_shortname = 'timpac';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
