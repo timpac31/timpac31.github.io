@@ -6,18 +6,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="필요성자바스크립트로 페이징 처리를해야 할 경우가 가끔있다. 여러가지 라이브러리들이 있지만 맘에 드는 것이 없어서(사실 별로 찾아보진 않았음 ^^) 간단하게 재활용할 수 있는 유틸 코드를 직접 만들어보려고한다.  TDD막상 만드려고 생각하니 어디서부터 시작해야할 지 막막했다.개인적으로 Java를 주로 사용하고 Javascript에서는 복잡한 로직을 다룰 일이">
+    <meta name="description" content="필요성자바스크립트로 페이징 처리를해야 할 경우가 가끔있다. 여러가지 라이브러리들이 있지만 맘에 드는 것이 없어서(사실 별로 찾아보진 않았음 ^^) 간단하게 재활용할 수 있는 유틸 코드를 직접 만들어보려고한다.  TDD막상 만드려고 생각하니 어디서부터 시작해야할 지 막막했다. 이럴땐 TDD도 하나의 좋은 방법이다.개인적으로 Java를 주로 사용하고 Javas">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TDD로 구현해보는 Javascript Paging">
 <meta property="og:url" content="https://timpac31.github.io/2024/02/14/TDD%EB%A1%9C-%EA%B5%AC%ED%98%84%ED%95%B4%EB%B3%B4%EB%8A%94-Javascript-Paging/index.html">
 <meta property="og:site_name" content="Timpac&#39;s Blog">
-<meta property="og:description" content="필요성자바스크립트로 페이징 처리를해야 할 경우가 가끔있다. 여러가지 라이브러리들이 있지만 맘에 드는 것이 없어서(사실 별로 찾아보진 않았음 ^^) 간단하게 재활용할 수 있는 유틸 코드를 직접 만들어보려고한다.  TDD막상 만드려고 생각하니 어디서부터 시작해야할 지 막막했다.개인적으로 Java를 주로 사용하고 Javascript에서는 복잡한 로직을 다룰 일이">
+<meta property="og:description" content="필요성자바스크립트로 페이징 처리를해야 할 경우가 가끔있다. 여러가지 라이브러리들이 있지만 맘에 드는 것이 없어서(사실 별로 찾아보진 않았음 ^^) 간단하게 재활용할 수 있는 유틸 코드를 직접 만들어보려고한다.  TDD막상 만드려고 생각하니 어디서부터 시작해야할 지 막막했다. 이럴땐 TDD도 하나의 좋은 방법이다.개인적으로 Java를 주로 사용하고 Javas">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:image" content="https://timpac31.github.io/images/refer/paging/success.jpg">
-<meta property="og:image" content="https://timpac31.github.io/images/refer/paging/paging-1.jpg">
-<meta property="og:image" content="https://timpac31.github.io/images/refer/paging/paging-2.jpg">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/paging/paging-1.JPG">
+<meta property="og:image" content="https://timpac31.github.io/images/refer/paging/paging-2.JPG">
 <meta property="article:published_time" content="2024-02-14T13:28:30.000Z">
-<meta property="article:modified_time" content="2024-02-14T11:33:42.790Z">
+<meta property="article:modified_time" content="2024-02-14T11:49:30.126Z">
 <meta property="article:author" content="Jo Yeoung Duk">
 <meta property="article:tag" content="Javascript">
 <meta property="article:tag" content="TDD">
@@ -144,7 +144,7 @@
 
   <div class="content" itemprop="articleBody">
     <h2 id="필요성"><a href="#필요성" class="headerlink" title="필요성"></a>필요성</h2><p>자바스크립트로 페이징 처리를해야 할 경우가 가끔있다. 여러가지 라이브러리들이 있지만 맘에 드는 것이 없어서(사실 별로 찾아보진 않았음 ^^) 간단하게 재활용할 수 있는 유틸 코드를 직접 만들어보려고한다. </p>
-<h2 id="TDD"><a href="#TDD" class="headerlink" title="TDD"></a>TDD</h2><p>막상 만드려고 생각하니 어디서부터 시작해야할 지 막막했다.<br>개인적으로 Java를 주로 사용하고 Javascript에서는 복잡한 로직을 다룰 일이 별로 없어서<br>Javascript로는 TDD를 해본적이 없다. 연습도해볼 겸 그냥 시도해 보았다.</p>
+<h2 id="TDD"><a href="#TDD" class="headerlink" title="TDD"></a>TDD</h2><p>막상 만드려고 생각하니 어디서부터 시작해야할 지 막막했다. 이럴땐 TDD도 하나의 좋은 방법이다.<br>개인적으로 Java를 주로 사용하고 Javascript에서는 복잡한 로직을 다룰 일이 별로 없어서<br>Javascript로는 TDD를 해본적이 없다. 연습도해볼 겸 그냥 시도해 보았다.</p>
 <p><a href="#%EC%B5%9C%EC%A2%85-%EC%BD%94%EB%93%9C">완성된 코드</a>는 맨 아래에 있지만 TDD 연습을 하고 싶은 분은 처음부터 따라해보는 걸 추천한다.</p>
 <ul>
 <li>간단한 테스트 검증 코드 만들기</li>
@@ -209,8 +209,8 @@
 <p>여기서부터는 UI 이기 때문에 테스트코드를 만들지 않고 화면에 뿌려서 직접 눈으로 확인했다.</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pagination = <span class="keyword">new</span> Pagination(<span class="number">101</span>, <span class="number">10</span>, <span class="number">10</span>);</span><br><span class="line">goPage(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">goPage</span>(<span class="params">pageNo</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">document</span>.body.innerHTML = pagination.html(pageNo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>브라우저에서 확인하면 다음과 같이 나온다.</p>
-<p><img src="/images/refer/paging/paging-1.jpg" alt="화면1"></p>
-<p><img src="/images/refer/paging/paging-2.jpg" alt="화면2"></p>
+<p><img src="/images/refer/paging/paging-1.JPG" alt="화면1"></p>
+<p><img src="/images/refer/paging/paging-2.JPG" alt="화면2"></p>
 <p>버튼을 클릭해보면 잘 작동한다.<br>하지만 한가지 마음에 들지 않는다. html() 메소드를 보면 html과 로직이 섞여있고, html이 변경될 때마다 Pagination 클래스를 변경해야한다. 단일책임 원칙이 지켜지지 않았기 때문이다.</p>
 <p>이러면 재사용하기도 어렵다. 로직과 html 템플릿을 분리해보자.</p>
 <p>먼저  html 태그를 정의할 PaginationTemplate 클래스를 만든다.</p>
