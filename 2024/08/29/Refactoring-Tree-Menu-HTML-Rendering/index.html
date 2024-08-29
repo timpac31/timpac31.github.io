@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang=ko>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="트리 메뉴 HTML 렌더링 리팩토링하기이슈 데이터베이스에서 메뉴데이터를 가져와 화면에 html로 보여주는 JSP 코드가 있었는데 매우 복잡하였다. 아래 사진은 코드의 일부분이다 ㅎㅎ    Scriptlet과 HTML이 섞여있고, 메뉴뎁스가 깊어질수록 for문안에 for문 if문이 중첩적으로 계속 늘어나면서 총 200라인이 넘어갔다. 이러다보니 메뉴쪽 디자인">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTML 메뉴 렌더링 리팩토링하기">
+<meta property="og:url" content="https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/index.html">
+<meta property="og:site_name" content="Timpac&#39;s Blog">
+<meta property="og:description" content="트리 메뉴 HTML 렌더링 리팩토링하기이슈 데이터베이스에서 메뉴데이터를 가져와 화면에 html로 보여주는 JSP 코드가 있었는데 매우 복잡하였다. 아래 사진은 코드의 일부분이다 ㅎㅎ    Scriptlet과 HTML이 섞여있고, 메뉴뎁스가 깊어질수록 for문안에 for문 if문이 중첩적으로 계속 늘어나면서 총 200라인이 넘어갔다. 이러다보니 메뉴쪽 디자인">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:image" content="https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/public/images/refer/legacyMenuRender.JPG">
+<meta property="og:image" content="https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/public/images/pain.jpg">
+<meta property="og:image" content="https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/public/images/refer/menuTest3.JPG">
+<meta property="article:published_time" content="2024-08-29T11:51:14.000Z">
+<meta property="article:modified_time" content="2024-08-29T11:52:30.871Z">
+<meta property="article:author" content="Jo Yeoung Duk">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="JAVA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/public/images/refer/legacyMenuRender.JPG">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>HTML 메뉴 렌더링 리팩토링하기</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2024/02/14/TDD%EB%A1%9C-%EA%B5%AC%ED%98%84%ED%95%B4%EB%B3%B4%EB%8A%94-Javascript-Paging/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&text=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&is_video=false&description=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=HTML 메뉴 렌더링 리팩토링하기&body=Check out this article: https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&name=HTML 메뉴 렌더링 리팩토링하기&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%ED%8A%B8%EB%A6%AC-%EB%A9%94%EB%89%B4-HTML-%EB%A0%8C%EB%8D%94%EB%A7%81-%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81%ED%95%98%EA%B8%B0"><span class="toc-number">1.</span> <span class="toc-text">트리 메뉴 HTML 렌더링 리팩토링하기</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%EC%9D%B4%EC%8A%88"><span class="toc-number">1.1.</span> <span class="toc-text">이슈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81"><span class="toc-number">1.2.</span> <span class="toc-text">리팩토링</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        HTML 메뉴 렌더링 리팩토링하기
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Timpac's Blog</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2024-08-29T11:51:14.000Z" itemprop="datePublished">2024-08-29</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/HTML/" rel="tag">HTML</a>, <a class="tag-link-link" href="/tags/JAVA/" rel="tag">JAVA</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h1 id="트리-메뉴-HTML-렌더링-리팩토링하기"><a href="#트리-메뉴-HTML-렌더링-리팩토링하기" class="headerlink" title="트리 메뉴 HTML 렌더링 리팩토링하기"></a>트리 메뉴 HTML 렌더링 리팩토링하기</h1><h2 id="이슈"><a href="#이슈" class="headerlink" title="이슈"></a>이슈</h2><ul>
+<li>데이터베이스에서 메뉴데이터를 가져와 화면에 html로 보여주는 JSP 코드가 있었는데 매우 복잡하였다. 아래 사진은 코드의 일부분이다 ㅎㅎ</li>
+</ul>
+<p><img src="public/images/refer/legacyMenuRender.JPG" alt="환장의 코드"></p>
+<ul>
+<li>Scriptlet과 HTML이 섞여있고, 메뉴뎁스가 깊어질수록 for문안에 for문 if문이 중첩적으로 계속 늘어나면서 총 200라인이 넘어갔다. 이러다보니 메뉴쪽 디자인을 변경할 때마다 매우 고통스러웠다.<br>보기만해도 다리가 후들거리고 숨이 탁탁 막힌다. 더 이상 고통받고 싶지 않아 리팩토링을 하기로 결심했다.</li>
+</ul>
+<p><img src="public/images/pain.jpg" alt="고통받는 짤"></p>
+<h2 id="리팩토링"><a href="#리팩토링" class="headerlink" title="리팩토링"></a>리팩토링</h2><p>먼저 메뉴 정보를 담을 Menu 클래스를 생성한다. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Menu</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String title;</span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> depth;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Menu</span><span class="params">(String title, String url, <span class="keyword">int</span> depth)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.title = title;</span><br><span class="line">        <span class="keyword">this</span>.url = url;</span><br><span class="line">        <span class="keyword">this</span>.depth = depth;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>실무에서는 더 많은 클래스 필드가 있었지만 여기서는 구현방법만 보여주기 위해 최대한 간단히 구성했다.</p>
+<p>다음으로 테스트 코드를 만든다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MenuTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">toHtml</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Menu menu = <span class="keyword">new</span> Menu(<span class="string">&quot;홈&quot;</span>, <span class="string">&quot;/site/home&quot;</span>, <span class="number">1</span>);</span><br><span class="line">        String expected = <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">                &lt;li&gt;&lt;a href=&quot;</span>/site/home<span class="string">&quot;&gt;홈&lt;/a&gt;&lt;/li&gt;&quot;</span><span class="string">&quot;&quot;</span>;</span><br><span class="line">        assertEquals(expected, menu.html());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>html() 메소드를 호출하면 위처럼 나오게하고 싶다. html() 메소드를 작성해보자.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">html</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    sb.append(<span class="string">&quot;&lt;li&gt;&lt;a href=\&quot;&quot;</span>).append(url).append(<span class="string">&quot;\&quot;&gt;&quot;</span>).append(title).append(<span class="string">&quot;&lt;/a&gt;&lt;/li&gt;&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>위와같이 작성하고 다시 테스트를 돌리면 성공한다.</p>
+<p>다음으로 하위메뉴가 들어갔을 때를 테스트해보자</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">void</span> 하위메뉴html() &#123;</span><br><span class="line">    Menu menu = <span class="keyword">new</span> Menu(<span class="string">&quot;홈&quot;</span>, <span class="string">&quot;/site/home&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    menu.addChild(<span class="keyword">new</span> Menu(<span class="string">&quot;소개&quot;</span>, <span class="string">&quot;/site/introduce&quot;</span>, <span class="number">2</span>));</span><br><span class="line">    menu.addChild(<span class="keyword">new</span> Menu(<span class="string">&quot;인사&quot;</span>, <span class="string">&quot;/site/greet&quot;</span>, <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">    String expected = <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">            &lt;li&gt;</span></span><br><span class="line"><span class="string">                &lt;a href=&quot;</span>/site/home<span class="string">&quot;&gt;홈&lt;/a&gt;</span></span><br><span class="line"><span class="string">                &lt;ul&gt;</span></span><br><span class="line"><span class="string">                    &lt;li&gt;&lt;a href=&quot;</span>/site/introduce<span class="string">&quot;&gt;소개&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                    &lt;li&gt;&lt;a href=&quot;</span>/site/greet<span class="string">&quot;&gt;인사&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;/ul&gt;</span></span><br><span class="line"><span class="string">            &lt;/li&gt;&quot;</span><span class="string">&quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line">    assertEquals(expected, menu.html());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>하위 메뉴를 가지기 위해 Menu에 List&lt;Menu&gt; children 을 추가하고 addChild(..) 메소드도 추가한다.</p>
+<p>또한 하위메뉴가 있으면 위처럼 ul 태그 안에 하위 리스트가 들어가게 만든다. html() 메서드도 수정해주자</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Menu</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String title;</span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> depth;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Menu&gt; children;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Menu</span><span class="params">(String title, String url, <span class="keyword">int</span> depth)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.title = title;</span><br><span class="line">        <span class="keyword">this</span>.url = url;</span><br><span class="line">        <span class="keyword">this</span>.depth = depth;</span><br><span class="line">        <span class="keyword">this</span>.children = <span class="keyword">new</span> ArrayList&lt;Menu&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">html</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        sb.append(<span class="string">&quot;&lt;li&gt;&lt;a href=\&quot;&quot;</span>).append(url).append(<span class="string">&quot;\&quot;&gt;&quot;</span>).append(title).append(<span class="string">&quot;&lt;/a&gt;&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (!children.isEmpty()) &#123;</span><br><span class="line">            sb.append(<span class="string">&quot;&lt;ul&gt;&quot;</span>);</span><br><span class="line">            <span class="keyword">for</span> (Menu child : children) &#123;</span><br><span class="line">                sb.append(child.html());</span><br><span class="line">            &#125;</span><br><span class="line">            sb.append(<span class="string">&quot;&lt;/ul&gt;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        sb.append(<span class="string">&quot;&lt;/li&gt;&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Menu childMenu)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.children.add(childMenu);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>테스트를 돌리니 실패했다. 확인해보니 expected 텍스트 블록의 띄어쓰기 때문이다. 정규식을 이용해 아래처럼 한줄로 바꿔서 테스트를하면 성공한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">String expected = <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">        &lt;li&gt;</span></span><br><span class="line"><span class="string">            &lt;a href=&quot;</span>/site/home<span class="string">&quot;&gt;홈&lt;/a&gt;</span></span><br><span class="line"><span class="string">            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;&lt;a href=&quot;</span>/site/introduce<span class="string">&quot;&gt;소개&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;&lt;a href=&quot;</span>/site/greet<span class="string">&quot;&gt;인사&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;/li&gt;&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">        .replaceAll(<span class="string">&quot;&gt;\\s+&lt;&quot;</span>, <span class="string">&quot;&gt;&lt;&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>하위 메뉴까지 성공했으니 이제 같은 depth의 이웃 메뉴 테스트를 해본다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">depth3NaviToHtml</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Menu menu = <span class="keyword">new</span> Menu(<span class="string">&quot;홈&quot;</span>, <span class="string">&quot;/site/home&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    Menu introduceMenu = <span class="keyword">new</span> Menu(<span class="string">&quot;소개&quot;</span>, <span class="string">&quot;/site/introduce&quot;</span>, <span class="number">2</span>);</span><br><span class="line">    introduceMenu.addChild(<span class="keyword">new</span> Menu(<span class="string">&quot;경력소개&quot;</span>, <span class="string">&quot;/site/career&quot;</span>, <span class="number">3</span>));</span><br><span class="line">    introduceMenu.addChild(<span class="keyword">new</span> Menu(<span class="string">&quot;취미&quot;</span>, <span class="string">&quot;/site/hobby&quot;</span>, <span class="number">3</span>));</span><br><span class="line">    menu.addChild(introduceMenu);</span><br><span class="line">    menu.addChild(<span class="keyword">new</span> Menu(<span class="string">&quot;인사&quot;</span>, <span class="string">&quot;/site/greet&quot;</span>, <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">    Menu boardMenu = <span class="keyword">new</span> Menu(<span class="string">&quot;게시판&quot;</span>, <span class="string">&quot;/site/board&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    boardMenu.addChild(<span class="keyword">new</span> Menu(<span class="string">&quot;공지사항&quot;</span>, <span class="string">&quot;/site/board/notice&quot;</span>, <span class="number">2</span>));</span><br><span class="line">    boardMenu.addChild(<span class="keyword">new</span> Menu(<span class="string">&quot;포토갤러리&quot;</span>, <span class="string">&quot;/site/board/photo&quot;</span>, <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">    Menu rootMenu = <span class="keyword">new</span> Menu(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="number">0</span>);</span><br><span class="line">    rootMenu.addChild(menu);</span><br><span class="line">    rootMenu.addChild(boardMenu);</span><br><span class="line"></span><br><span class="line">    String expected = <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;&lt;a href=&quot;</span>/site/home<span class="string">&quot;&gt;홈&lt;/a&gt;</span></span><br><span class="line"><span class="string">                    &lt;ul&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/introduce<span class="string">&quot;&gt;소개&lt;/a&gt;</span></span><br><span class="line"><span class="string">                            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                                &lt;li&gt;&lt;a href=&quot;</span>/site/career<span class="string">&quot;&gt;경력소개&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                                &lt;li&gt;&lt;a href=&quot;</span>/site/hobby<span class="string">&quot;&gt;취미&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                            &lt;/ul&gt;</span></span><br><span class="line"><span class="string">                        &lt;/li&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/greet<span class="string">&quot;&gt;인사&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                    &lt;/ul&gt;</span></span><br><span class="line"><span class="string">                &lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;&lt;a href=&quot;</span>/site/board<span class="string">&quot;&gt;게시판&lt;/a&gt;</span></span><br><span class="line"><span class="string">                    &lt;ul&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/board/notice<span class="string">&quot;&gt;공지사항&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/board/photo<span class="string">&quot;&gt;포토갤러리&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                    &lt;/ul&gt;</span></span><br><span class="line"><span class="string">                &lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;/ul&gt;&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">            .replaceAll(<span class="string">&quot;&gt;\\s+&lt;&quot;</span>, <span class="string">&quot;&gt;&lt;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    assertEquals(expected, rootMenu.html());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>홈메뉴와 같은 레벨의 게시판 메뉴를 만들어서 루트 메뉴에 추가했다.<br>위와 같은 expected 구조를 예상하여 테스트 했더니 실패했다.</p>
+<p><img src="public/images/refer/menuTest3.JPG" alt="테스트 실패"></p>
+<p>위와 같이 루트메뉴는 링크 태그가 생성되면 안되는데 생성되어서 실패한다.</p>
+<p>해결하기 위해서 아래와같이 html() 메소드를 수정했다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">html</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="keyword">if</span> (depth != <span class="number">0</span>) &#123;</span><br><span class="line">        sb.append(<span class="string">&quot;&lt;li&gt;&lt;a href=\&quot;&quot;</span>).append(url).append(<span class="string">&quot;\&quot;&gt;&quot;</span>).append(title).append(<span class="string">&quot;&lt;/a&gt;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!children.isEmpty()) &#123;</span><br><span class="line">        sb.append(<span class="string">&quot;&lt;ul&gt;&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (Menu child : children) &#123;</span><br><span class="line">            sb.append(child.html());</span><br><span class="line">        &#125;</span><br><span class="line">        sb.append(<span class="string">&quot;&lt;/ul&gt;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (depth != <span class="number">0</span>) &#123;</span><br><span class="line">        sb.append(<span class="string">&quot;&lt;/li&gt;&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>루트메뉴가 아닐 때 (depth != 0) 만 &lt;li&gt; 태그를 생성하게 만든다.</p>
+<p>다시 테스트를 하면 성공한다. 메뉴 생성 로직에 중복이 보이니 이쯤에서 테스트코드를 리팩토링해준다.<br>메뉴생성 코드를 필드로 추출한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu1 = <span class="keyword">new</span> Menu(<span class="string">&quot;홈&quot;</span>, <span class="string">&quot;/site/home&quot;</span>, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_1 = <span class="keyword">new</span> Menu(<span class="string">&quot;소개&quot;</span>, <span class="string">&quot;/site/introduce&quot;</span>, <span class="number">2</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_1_1 = <span class="keyword">new</span> Menu(<span class="string">&quot;경력소개&quot;</span>, <span class="string">&quot;/site/career&quot;</span>, <span class="number">3</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_1_2 = <span class="keyword">new</span> Menu(<span class="string">&quot;취미&quot;</span>, <span class="string">&quot;/site/hobby&quot;</span>, <span class="number">3</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_2 = <span class="keyword">new</span> Menu(<span class="string">&quot;인사&quot;</span>, <span class="string">&quot;/site/greet&quot;</span>, <span class="number">2</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu2 = <span class="keyword">new</span> Menu(<span class="string">&quot;게시판&quot;</span>, <span class="string">&quot;/site/board&quot;</span>, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu2_1 = <span class="keyword">new</span> Menu(<span class="string">&quot;공지사항&quot;</span>, <span class="string">&quot;/site/board/notice&quot;</span>, <span class="number">2</span>);</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Menu menu2_2 = <span class="keyword">new</span> Menu(<span class="string">&quot;포토갤러리&quot;</span>, <span class="string">&quot;/site/board/photo&quot;</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="meta">@TEST</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">//테스트 메소드들도 위 필드를 사용하도록 수정</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>변경 후 다시 테스트를 실행시켜보자. 성공한다면 일단 기본적인 HTML rendering은 끝났다.</p>
+<p>다음으로 DB에서 가져온 메뉴 리스트로 Menu 를 생성할 수 있게 만들어야한다.<br>DB에서 계층쿼리를 사용해 가져오기 때문에 순서만 정렬된 인접리스트 형태일 것이다.<br>트리계층 구조로 바꾸려면 식별자와 부모식별자가 필요하다. Menu 클래스에 id와 parentId를 추가한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Menu</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Long id;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Long parentId;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String title;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String url;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> depth;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;Menu&gt; children;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Menu</span><span class="params">(Long id, Long parentId, String title, String url, <span class="keyword">int</span> depth)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">        <span class="keyword">this</span>.parentId = parentId;</span><br><span class="line">        <span class="keyword">this</span>.title = title;</span><br><span class="line">        <span class="keyword">this</span>.url = url;</span><br><span class="line">        <span class="keyword">this</span>.depth = depth;</span><br><span class="line">        <span class="keyword">this</span>.children = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Menu</span><span class="params">(String title, String url, <span class="keyword">int</span> depth)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(<span class="keyword">null</span>, <span class="keyword">null</span>, title, url, depth);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//생략...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MenuTest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu root = <span class="keyword">new</span> Menu(<span class="number">0L</span>, <span class="keyword">null</span>, <span class="string">&quot;root&quot;</span>, <span class="string">&quot;/&quot;</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu1 = <span class="keyword">new</span> Menu(<span class="number">1L</span>, <span class="number">0L</span>, <span class="string">&quot;홈&quot;</span>, <span class="string">&quot;/site/home&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_1 = <span class="keyword">new</span> Menu(<span class="number">2L</span>, <span class="number">1L</span>, <span class="string">&quot;소개&quot;</span>, <span class="string">&quot;/site/introduce&quot;</span>, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_1_1 = <span class="keyword">new</span> Menu(<span class="number">3L</span>, <span class="number">2L</span>, <span class="string">&quot;경력소개&quot;</span>, <span class="string">&quot;/site/career&quot;</span>, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_1_2 = <span class="keyword">new</span> Menu(<span class="number">4L</span>, <span class="number">2L</span>, <span class="string">&quot;취미&quot;</span>, <span class="string">&quot;/site/hobby&quot;</span>, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu1_2 = <span class="keyword">new</span> Menu(<span class="number">5L</span>, <span class="number">1L</span>, <span class="string">&quot;인사&quot;</span>, <span class="string">&quot;/site/greet&quot;</span>, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu2 = <span class="keyword">new</span> Menu(<span class="number">6L</span>, <span class="number">0L</span>, <span class="string">&quot;게시판&quot;</span>, <span class="string">&quot;/site/board&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu2_1 = <span class="keyword">new</span> Menu(<span class="number">7L</span>, <span class="number">6L</span>, <span class="string">&quot;공지사항&quot;</span>, <span class="string">&quot;/site/board/notice&quot;</span>, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Menu menu2_2 = <span class="keyword">new</span> Menu(<span class="number">8L</span>, <span class="number">6L</span>, <span class="string">&quot;포토갤러리&quot;</span>, <span class="string">&quot;/site/board/photo&quot;</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//생략...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>인접리스트 메뉴를 생성자 인자로 받아서 트리 메뉴를 생성하는 테스트를 다음과 같이 만든다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="meta">@DisplayName(&quot;메뉴목록을 계층구조로 생성하여 렌더링&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">menuListToMenuTree</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    List&lt;Menu&gt; adjacentMenuList = List.of(root, menu1, menu1_1, menu1_1_1, menu1_1_2, menu1_2, menu2, menu2_1, menu2_2);</span><br><span class="line">    Menu rootMenu = <span class="keyword">new</span> Menu(adjacentMenuList);</span><br><span class="line"></span><br><span class="line">    String expected = <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;&lt;a href=&quot;</span>/site/home<span class="string">&quot;&gt;홈&lt;/a&gt;</span></span><br><span class="line"><span class="string">                    &lt;ul&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/introduce<span class="string">&quot;&gt;소개&lt;/a&gt;</span></span><br><span class="line"><span class="string">                            &lt;ul&gt;</span></span><br><span class="line"><span class="string">                                &lt;li&gt;&lt;a href=&quot;</span>/site/career<span class="string">&quot;&gt;경력소개&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                                &lt;li&gt;&lt;a href=&quot;</span>/site/hobby<span class="string">&quot;&gt;취미&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                            &lt;/ul&gt;</span></span><br><span class="line"><span class="string">                        &lt;/li&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/greet<span class="string">&quot;&gt;인사&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                    &lt;/ul&gt;</span></span><br><span class="line"><span class="string">                &lt;/li&gt;</span></span><br><span class="line"><span class="string">                &lt;li&gt;&lt;a href=&quot;</span>/site/board<span class="string">&quot;&gt;게시판&lt;/a&gt;</span></span><br><span class="line"><span class="string">                    &lt;ul&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/board/notice<span class="string">&quot;&gt;공지사항&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                        &lt;li&gt;&lt;a href=&quot;</span>/site/board/photo<span class="string">&quot;&gt;포토갤러리&lt;/a&gt;&lt;/li&gt;</span></span><br><span class="line"><span class="string">                    &lt;/ul&gt;</span></span><br><span class="line"><span class="string">                &lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;/ul&gt;&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">            .replaceAll(<span class="string">&quot;&gt;\\s+&lt;&quot;</span>, <span class="string">&quot;&gt;&lt;&quot;</span>);</span><br><span class="line"></span><br><span class="line">    assertEquals(expected, menu.html());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>생성자를 구현해준다. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Menu</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Menu</span><span class="params">(List&lt;Menu&gt; adjacentMenuList)</span> </span>&#123;</span><br><span class="line">        Map&lt;Long, Menu&gt; menuMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        Menu rootMenu = adjacentMenuList.get(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">for</span> (Menu menu : adjacentMenuList) &#123;</span><br><span class="line">            <span class="keyword">if</span> (menu.getId() != <span class="keyword">null</span>) menuMap.put(menu.getId(), menu);</span><br><span class="line">            Menu parentMenu = menuMap.get(menu.getParentId());</span><br><span class="line">            <span class="keyword">if</span> (parentMenu != <span class="keyword">null</span>) &#123;</span><br><span class="line">                parentMenu.addChild(menu);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.id = rootMenu.getId();</span><br><span class="line">        <span class="keyword">this</span>.parentId = rootMenu.getParentId();</span><br><span class="line">        <span class="keyword">this</span>.title = rootMenu.getTitle();</span><br><span class="line">        <span class="keyword">this</span>.url = rootMenu.getUrl();</span><br><span class="line">        <span class="keyword">this</span>.depth = rootMenu.getDepth();</span><br><span class="line">        <span class="keyword">this</span>.children = rootMenu.getChildren();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>위 생성 알고리즘에서 중요한점은 adjacentMenuList가 정렬이 되어있어야한다는 것이다.<br>부모메뉴가 먼저 있어야 제대로 생성된다.</p>
+<p>트리메뉴는 생성시 메모리를 많이 쓰며, 메뉴는 자주 로딩되기때문에 캐시를 사용하는 것이 좋겠다.</p>
+<p>끝~ ^__^</p>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%ED%8A%B8%EB%A6%AC-%EB%A9%94%EB%89%B4-HTML-%EB%A0%8C%EB%8D%94%EB%A7%81-%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81%ED%95%98%EA%B8%B0"><span class="toc-number">1.</span> <span class="toc-text">트리 메뉴 HTML 렌더링 리팩토링하기</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%EC%9D%B4%EC%8A%88"><span class="toc-number">1.1.</span> <span class="toc-text">이슈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81"><span class="toc-number">1.2.</span> <span class="toc-text">리팩토링</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&text=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&is_video=false&description=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=HTML 메뉴 렌더링 리팩토링하기&body=Check out this article: https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&title=HTML 메뉴 렌더링 리팩토링하기"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://timpac31.github.io/2024/08/29/Refactoring-Tree-Menu-HTML-Rendering/&name=HTML 메뉴 렌더링 리팩토링하기&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2024 Jo Yeoung Duk
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/Search/">Search</a></li>
+         
+          <li><a href="/tags/">Tags</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+
+
+    <!-- Disqus Comments -->
+    <script type="text/javascript">
+        var disqus_shortname = 'timpac';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
